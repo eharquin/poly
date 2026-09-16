@@ -5,6 +5,7 @@ const KEYS = {
   settings: 'poly.settings',
   cache: 'poly.data-cache',
   draft: 'poly.draft',
+  drillDraft: 'poly.drill-draft',
   pending: 'poly.pending',
 }
 
@@ -46,6 +47,12 @@ export const saveCache = (data) => write(KEYS.cache, data)
 export const loadDraft = () => read(KEYS.draft, null)
 export const saveDraft = (d) => write(KEYS.draft, d)
 export const clearDraft = () => write(KEYS.draft, null)
+
+// Série d'exercices en cours (file, position, réponses) : on ne perd pas
+// une série commencée dans le métro parce que l'écran s'est verrouillé.
+export const loadDrillDraft = () => read(KEYS.drillDraft, null)
+export const saveDrillDraft = (d) => write(KEYS.drillDraft, d)
+export const clearDrillDraft = () => write(KEYS.drillDraft, null)
 
 // File d'attente des écritures non synchronisées : [{ id, op, message, createdAt }]
 export const loadPending = () => read(KEYS.pending, [])

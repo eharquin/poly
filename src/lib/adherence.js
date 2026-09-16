@@ -55,11 +55,13 @@ export function computeAdherence(sessions, referenceDate = todayISO()) {
 /**
  * Dernière pratique par instrument, avec un statut de fraîcheur dépendant de
  * la priorité de l'instrument : 'ok' | 'warn' | 'stale' | 'never'.
- * Toutes les séances comptent ici, y compris les libres.
+ * Les séances libres comptent ; les exercices sans instrument ('drill'), non —
+ * il s'agit de mains sur l'instrument.
  */
 export function computeLastPracticed(sessions, today = todayISO()) {
   const last = {}
   for (const s of sessions) {
+    if (s.sessionType === 'drill') continue
     if (!last[s.instrument] || s.date > last[s.instrument]) last[s.instrument] = s.date
   }
   return INSTRUMENTS.map(({ id, label, priority }) => {

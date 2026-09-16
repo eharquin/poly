@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import DrillScreen from './components/DrillScreen.jsx'
 import HistoryScreen from './components/HistoryScreen.jsx'
 import Nav from './components/Nav.jsx'
 import ProgressScreen from './components/ProgressScreen.jsx'
@@ -45,6 +46,12 @@ export default function App() {
         {tab === 'today' &&
           (configured ? (
             <TodayScreen data={data} settings={settings} onCommit={commit} />
+          ) : (
+            <NeedConfig go={() => setTab('settings')} />
+          ))}
+        {tab === 'drill' &&
+          (configured ? (
+            <DrillScreen data={data} settings={settings} onCommit={commit} />
           ) : (
             <NeedConfig go={() => setTab('settings')} />
           ))}

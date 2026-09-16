@@ -87,7 +87,11 @@ export default function TodayScreen({ data, settings, onCommit }) {
                     {instrumentLabel(s.instrument)} · {sessionLabel(s.instrument, s.sessionType)}
                   </strong>
                   <span className="muted small">
-                    {s.blocks?.length ? `${s.blocks.length} bloc${s.blocks.length > 1 ? 's' : ''}` : 'libre'}
+                    {s.sessionType === 'drill'
+                      ? `${s.blocks.length} carte${s.blocks.length > 1 ? 's' : ''} · ${s.blocks.filter((b) => b.correct).length} justes`
+                      : s.blocks?.length
+                        ? `${s.blocks.length} bloc${s.blocks.length > 1 ? 's' : ''}`
+                        : 'libre'}
                   </span>
                 </span>
                 {s.note && <span className="muted small">{s.note}</span>}

@@ -121,8 +121,12 @@ export function getSessionConfig(instrument, sessionType) {
   return PROGRAM[instrument]?.[sessionType] ?? null
 }
 
+// Types de séance hors programme : jamais dans ADHERENCE_TARGETS.
+const RESERVED_SESSION_LABELS = { [FREE_SESSION.id]: FREE_SESSION.label, drill: 'Exercices' }
+
 export function sessionLabel(instrument, sessionType) {
-  if (!sessionType || sessionType === FREE_SESSION.id) return FREE_SESSION.label
+  if (!sessionType) return FREE_SESSION.label
+  if (sessionType in RESERVED_SESSION_LABELS) return RESERVED_SESSION_LABELS[sessionType]
   return getSessionConfig(instrument, sessionType)?.label ?? sessionType
 }
 

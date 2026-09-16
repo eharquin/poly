@@ -1,6 +1,8 @@
 import { useMemo, useRef, useState } from 'react'
 import { instrumentLabel } from '../config/instruments.js'
 import { getBlockConfig, sessionLabel } from '../config/program.js'
+import { getDrill } from '../lib/drills.js'
+import { chordName } from '../lib/theory.js'
 import { addDays, formatDateFR, mondayOf, toISO, todayISO } from '../lib/cycle.js'
 import { activeDates } from '../lib/adherence.js'
 import { deleteSession, newSessionId, replaceSessions, sortedSessions } from '../lib/ops.js'
@@ -143,7 +145,22 @@ export default function HistoryScreen({ data, onCommit }) {
             {s.note ? ` · ${s.note}` : ''}
           </div>
 
-          {s.blocks?.length > 0 && (
+          {s.sessionType === 'drill' && s.blocks?.length > 0 && (
+            <table className="table">
+              <tbody>
+                {s.blocks.map((b, i) => {
+                  const card = getDrill(b.drillId)?.getCard(b.cardId)
+                  return (
+                    <tr key={`${b.cardId}-${i}`}>
+                      <td>{card ? chordName(card.root, card.quality) : b.cardId}</td>
+                      <td className={`num ${b.correct ? 'status-ok' : 'status-low'}`}>{b.correct ? '✓ juste' : '✕ faux'}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+          {s.sessionType !== 'drill' && s.blocks?.length > 0 && (
             <table className="table">
               <tbody>
                 {s.blocks.map((b) => (
