@@ -28,6 +28,11 @@ function sortSessions(sessions) {
   return sessions.sort((a, b) => a.date.localeCompare(b.date) || String(a.id).localeCompare(String(b.id)))
 }
 
+/** Ordre canonique de lecture des séances (le même qu'à l'écriture). */
+export function sortedSessions(sessions) {
+  return sortSessions([...sessions])
+}
+
 export function applyOp(data, op) {
   switch (op.type) {
     case 'upsertSession':

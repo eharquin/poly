@@ -1,7 +1,5 @@
-// Tout ce qui est propre au plan d'entraînement vit ici : instruments suivis,
-// rotation hebdomadaire, séquenceur de tonalités. Ajouter un instrument plus
-// tard (basse, batterie…) = une ligne dans INSTRUMENTS, aucun changement de
-// schéma de données.
+// Qui est suivi et quand. Le CONTENU des séances vit dans program.js ;
+// ce fichier ne décrit que les instruments et le calendrier hebdomadaire.
 
 export const INSTRUMENTS = [
   { id: 'piano', label: 'Piano', priority: 'haute' },
@@ -9,20 +7,20 @@ export const INSTRUMENTS = [
   { id: 'voix', label: 'Voix', priority: 'entretien' },
 ]
 
-// Rotation hebdo — le "principal" (bloc complet, théorie appliquée incluse)
-// alterne piano/guitare un jour sur deux (jamais deux fois de suite, pour
+// Rotation hebdo — le "principal" (séance complète, cf. program.js) alterne
+// piano/guitare un jour sur deux (jamais deux fois de suite, pour
 // l'interférence contextuelle) ; le "secondaire" est une touche courte
-// (5-10 min) sur l'AUTRE instrument, pour que les deux bénéficient d'une
-// consolidation motrice pendant le sommeil chaque nuit plutôt qu'une nuit
-// sur deux. Affiché en suggestion sur TodayScreen, jamais imposé.
+// (5-10 min, libre, pas de blocs formels) sur l'AUTRE instrument, pour que
+// les deux bénéficient d'une consolidation motrice pendant le sommeil
+// chaque nuit plutôt qu'une nuit sur deux.
 export const WEEKLY_ROTATION = {
-  mon: { main: 'piano', secondary: 'guitare' },
-  tue: { main: 'guitare', secondary: 'piano' },
-  wed: { main: 'piano', secondary: 'guitare' },
-  thu: { main: 'guitare', secondary: 'piano' },
-  fri: { main: 'piano', secondary: 'guitare' },
-  sat: { main: 'guitare', secondary: 'piano' },
-  sun: { main: 'libre', secondary: null }, // composition
+  mon: { main: { instrument: 'piano', session: 'technique' }, secondary: 'guitare' },
+  tue: { main: { instrument: 'guitare', session: 'manche' }, secondary: 'piano' },
+  wed: { main: { instrument: 'piano', session: 'repertoire' }, secondary: 'guitare' },
+  thu: { main: { instrument: 'guitare', session: 'rythme' }, secondary: 'piano' },
+  fri: { main: { instrument: 'piano', session: 'technique' }, secondary: 'guitare' },
+  sat: { main: { instrument: 'guitare', session: 'manche' }, secondary: 'piano' },
+  sun: { main: { instrument: 'libre', session: null }, secondary: null }, // composition, hors adhérence
 }
 
 // Voix : habitude quotidienne indépendante, détachée de la rotation
@@ -45,21 +43,14 @@ export const KEY_CYCLE_WEEKS = 2
 export const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 
 // Jour sans instrument imposé (dimanche) : composition.
-export const FREE_DAY = { id: 'libre', label: 'Libre', hint: 'Composition — applique ce qui a été travaillé dans la semaine.' }
+export const FREE_DAY = {
+  id: 'libre',
+  label: 'Libre',
+  hint: 'Composition — applique ce qui a été travaillé dans la semaine. Hors adhérence.',
+}
 
-// Suggestions de durée affichées sur TodayScreen (jamais imposées).
-export const MAIN_HINT = 'bloc complet, théorie appliquée incluse'
-export const SECONDARY_HINT = '5-10 min sur l\'autre instrument, avant de dormir'
-export const VOICE_HABIT_HINT = 'quelques minutes de justesse sans repère (hors session)'
-
-// Durées proposées en chips dans le formulaire de log.
-export const DURATION_CHIPS = [10, 20, 30, 45, 60]
-
-// Plafond d'XP : au-delà, une séance plus longue sur le MÊME instrument le
-// même jour ne rapporte plus rien. Anti-bourrage — une journée de 3 h sur un
-// seul instrument ne doit pas battre une semaine alternée piano/guitare, sur
-// laquelle repose toute l'interférence contextuelle du plan.
-export const XP_CAP_MINUTES = 45
+export const SECONDARY_HINT = "5-10 min sur l'autre instrument, libre, avant de dormir"
+export const VOICE_HABIT_HINT = 'quelques minutes de justesse sans repère (hors séance)'
 
 // Seuils de fraîcheur (en jours depuis la dernière pratique) par priorité,
 // pour le code couleur "dernière pratique".

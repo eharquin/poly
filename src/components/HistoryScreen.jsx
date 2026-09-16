@@ -1,8 +1,9 @@
 import { useMemo, useRef, useState } from 'react'
 import { instrumentLabel } from '../config/instruments.js'
+import { getBlockConfig, sessionLabel } from '../config/program.js'
 import { addDays, formatDateFR, mondayOf, toISO, todayISO } from '../lib/cycle.js'
-import { deleteSession, newSessionId, replaceSessions } from '../lib/ops.js'
-import { minutesByDate, sortedSessions } from '../lib/stats.js'
+import { activeDates } from '../lib/adherence.js'
+import { deleteSession, newSessionId, replaceSessions, sortedSessions } from '../lib/ops.js'
 
 const CALENDAR_WEEKS = 9
 const DOW = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
@@ -24,17 +25,16 @@ function normalizeImport(raw) {
       throw new Error(`séance ${i + 1} : date manquante ou invalide`)
     }
     if (!s.instrument) throw new Error(`séance ${i + 1} : instrument manquant`)
-    const minutes = Number(s.minutes)
-    if (!Number.isFinite(minutes) || minutes <= 0) throw new Error(`séance ${i + 1} : durée invalide`)
-    // Les champs des phases suivantes (drillId, tempo…) sont conservés tels quels.
-    return { ...s, id: s.id ?? newSessionId(), minutes: Math.round(minutes) }
+    if (s.blocks && !Array.isArray(s.blocks)) throw new Error(`séance ${i + 1} : "blocks" n'est pas un tableau`)
+    // Les champs des phases suivantes (drillId, boxLeitner…) passent tels quels.
+    return { ...s, id: s.id ?? newSessionId(), blocks: s.blocks ?? [] }
   })
 }
 
 export default function HistoryScreen({ data, onCommit }) {
   const today = todayISO()
   const sessions = useMemo(() => sortedSessions(data.sessions).reverse(), [data.sessions])
-  const minutes = useMemo(() => minutesByDate(data.sessions), [data.sessions])
+  const active = useMemo(() => activeDates(data.sessions), [data.sessions])
   const weeks = useMemo(() => buildCalendar(today), [today])
   const [confirm, setConfirm] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -100,14 +100,9 @@ export default function HistoryScreen({ data, onCommit }) {
           {weeks.map((week) => (
             <div className="cal-row" key={week[0]}>
               {week.map((iso) => {
-                const min = minutes[iso] ?? 0
-                const state = iso > today ? 'future' : min ? 'active' : 'idle'
+                const state = iso > today ? 'future' : active.has(iso) ? 'active' : 'idle'
                 return (
-                  <span
-                    key={iso}
-                    className={`cal-day cal-${state} ${iso === today ? 'cal-today' : ''}`}
-                    title={`${formatDateFR(iso)}${min ? ` — ${min} min` : ''}`}
-                  />
+                  <span key={iso} className={`cal-day cal-${state} ${iso === today ? 'cal-today' : ''}`} title={formatDateFR(iso)} />
                 )
               })}
             </div>
@@ -141,12 +136,39 @@ export default function HistoryScreen({ data, onCommit }) {
             <strong>
               {formatDateFR(s.date)} · {instrumentLabel(s.instrument)}
             </strong>
-            <span className="mono">{s.minutes} min</span>
+            <span className="muted small">{sessionLabel(s.instrument, s.sessionType)}</span>
           </div>
           <div className="muted small">
             {s.key_of_week ? `Tonalité ${s.key_of_week}` : 'Tonalité non renseignée'}
             {s.note ? ` · ${s.note}` : ''}
           </div>
+
+          {s.blocks?.length > 0 && (
+            <table className="table">
+              <tbody>
+                {s.blocks.map((b) => (
+                  <tr key={b.exerciseId}>
+                    <td>{getBlockConfig(b.exerciseId)?.label ?? b.exerciseId}</td>
+                    <td className="num mono">
+                      {typeof b.tempoBpm === 'number' ? `${b.tempoBpm} BPM · ${b.cleanPasses ?? 0} propre(s)` : 'fait'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          {s.blocks?.some((b) => b.note) && (
+            <ul className="block-notes">
+              {s.blocks
+                .filter((b) => b.note)
+                .map((b) => (
+                  <li key={b.exerciseId} className="muted small">
+                    {getBlockConfig(b.exerciseId)?.label ?? b.exerciseId} : {b.note}
+                  </li>
+                ))}
+            </ul>
+          )}
+
           {confirm === s.id ? (
             <div className="actions">
               <button type="button" className="btn secondary" onClick={() => setConfirm(null)} disabled={busy}>

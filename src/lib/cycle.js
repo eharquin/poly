@@ -48,11 +48,12 @@ export function dayKey(date) {
 }
 
 /**
- * Suggestion du jour : { main, secondary }. `main` vaut 'libre' le dimanche.
+ * Programme du jour : { main: { instrument, session }, secondary }.
+ * `main.instrument` vaut 'libre' le dimanche (composition, hors adhérence).
  * Simple lecture de la config — rien n'est imposé à l'utilisateur.
  */
 export function getRotationForDate(date) {
-  return WEEKLY_ROTATION[dayKey(date)] ?? { main: 'libre', secondary: null }
+  return WEEKLY_ROTATION[dayKey(date)] ?? { main: { instrument: 'libre', session: null }, secondary: null }
 }
 
 /** Nombre de semaines pleines (lundi → lundi) écoulées entre deux dates. */
