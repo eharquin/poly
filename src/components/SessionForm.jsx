@@ -2,7 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { isTempoBlock, sessionLabel } from '../config/program.js'
 import { formatDateFR, getKeyOfWeek } from '../lib/cycle.js'
 import { newSessionId, upsertSession } from '../lib/ops.js'
-import { CLEAN_PASSES_REQUIRED, TEMPO_STEP_BPM, getCurrentTempo, getNextTarget } from '../lib/progression.js'
+import {
+  CLEAN_PASSES_REQUIRED,
+  STAGNATION_HINT,
+  TEMPO_STEP_BPM,
+  getCurrentTempo,
+  getNextTarget,
+  getStagnation,
+} from '../lib/progression.js'
 import { clearDraft, loadDraft, saveDraft } from '../lib/storage.js'
 
 const CLEAN_CHOICES = [0, 1, 2, 3, 4, 5]
@@ -38,7 +45,11 @@ export default function SessionForm({ date, instrument, sessionType, blocks, ses
     const out = {}
     for (const block of blocks) {
       if (isTempoBlock(block)) {
-        out[block.id] = { target: getNextTarget(sessions, block.id), current: getCurrentTempo(sessions, block.id) }
+        out[block.id] = {
+          target: getNextTarget(sessions, block.id),
+          current: getCurrentTempo(sessions, block.id),
+          stagnation: getStagnation(sessions, block.id),
+        }
       }
     }
     return out
@@ -123,6 +134,9 @@ export default function SessionForm({ date, instrument, sessionType, blocks, ses
                     </span>
                   )}
                   {!tempo && <span className="muted small"> · qualitatif, sans tempo</span>}
+                  {tempo?.stagnation.stagnating && (
+                    <span className="stagnant small"> · stagne depuis {tempo.stagnation.count} séances</span>
+                  )}
                 </span>
               </button>
 
@@ -168,6 +182,12 @@ export default function SessionForm({ date, instrument, sessionType, blocks, ses
                         : `Objectif tenu → ${Math.min(Number(entry.tempoBpm) + TEMPO_STEP_BPM, block.capBpm)} BPM la prochaine fois.`
                       : `${CLEAN_PASSES_REQUIRED} passages propres d'affilée pour monter de ${TEMPO_STEP_BPM} BPM.`}
                   </p>
+                  {tempo.stagnation.stagnating && (
+                    <p className="hint">
+                      <strong>Bloqué à {tempo.stagnation.tempoBpm} BPM depuis {tempo.stagnation.count} séances.</strong>{' '}
+                      {STAGNATION_HINT}
+                    </p>
+                  )}
                   <input
                     className="block-note"
                     value={entry.note ?? ''}

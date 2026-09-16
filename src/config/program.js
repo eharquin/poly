@@ -58,6 +58,7 @@ export const PROGRAM = {
         {
           id: 't1',
           blocks: [
+            { id: 'araignee_doigts', label: 'Araignée (index/majeur/annulaire/auriculaire, 4 cases, montée/descente cordes)', startTempoBpm: 60, capBpm: 110 },
             { id: 'gamme_position_maj', label: 'Gamme majeure/mineure, 1 position, tonalité de la semaine', startTempoBpm: 70, capBpm: 120 },
             { id: 'accord_vers_gamme_lent', label: 'Accord plaqué -> gamme, transition lente', startTempoBpm: 60, capBpm: 100 },
           ],
@@ -82,7 +83,13 @@ export const PROGRAM = {
     rythme: {
       label: 'Rythme & accords',
       tiers: [
-        { id: 't1', blocks: [{ id: 'fingerstyle_simple', label: 'Fingerstyle pouce + 1 doigt, progression connue', startTempoBpm: 60, capBpm: 100 }] },
+        {
+          id: 't1',
+          blocks: [
+            { id: 'fingerstyle_simple', label: 'Fingerstyle pouce + 1 doigt, progression connue', startTempoBpm: 60, capBpm: 100 },
+            { id: 'soustraction_rythme', label: 'Doubles croches muettes (dead notes) + soustraction de temps (retirer le 2e puis le 4e coup)', startTempoBpm: 60, capBpm: 110 },
+          ],
+        },
         { id: 't2', blocks: [{ id: 'fingerstyle_complet', label: 'Fingerstyle pouce + 3 doigts', startTempoBpm: 50, capBpm: 90 }] },
         { id: 't3', blocks: [{ id: 'fingerstyle_syncope', label: 'Fingerstyle syncopé/complexe', startTempoBpm: 50, capBpm: 80 }] },
       ],

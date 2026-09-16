@@ -3,7 +3,7 @@ import { getBlockConfig, allCategories } from '../config/program.js'
 import { instrumentLabel } from '../config/instruments.js'
 import { formatDateFR } from '../lib/cycle.js'
 import { ADHERENCE_WINDOW_DAYS, computeAdherence, computeLastPracticed } from '../lib/adherence.js'
-import { getTempoHistory, practisedExerciseIds } from '../lib/progression.js'
+import { getStagnation, getTempoHistory, practisedExerciseIds } from '../lib/progression.js'
 import { getActiveTier } from '../lib/tiers.js'
 
 // Statut d'adhérence : couleur réservée + icône + libellé. Jamais la couleur
@@ -32,7 +32,7 @@ export default function ProgressScreen({ data }) {
   )
   const charts = useMemo(() => {
     return practisedExerciseIds(sessions)
-      .map((id) => ({ id, config: getBlockConfig(id), history: getTempoHistory(sessions, id) }))
+      .map((id) => ({ id, config: getBlockConfig(id), history: getTempoHistory(sessions, id), stagnation: getStagnation(sessions, id) }))
       .filter((c) => c.config && c.history.length)
       .sort((a, b) => a.config.instrument.localeCompare(b.config.instrument) || a.config.label.localeCompare(b.config.label))
   }, [sessions])
@@ -94,7 +94,7 @@ export default function ProgressScreen({ data }) {
               suivant. Le détail chiffré de chaque séance est dans Historique.
             </p>
             {charts.map((c) => (
-              <TempoChart key={c.id} config={c.config} history={c.history} />
+              <TempoChart key={c.id} config={c.config} history={c.history} stagnation={c.stagnation} />
             ))}
           </>
         )}
@@ -123,7 +123,7 @@ export default function ProgressScreen({ data }) {
  * série, donc pas de légende — le titre nomme ce qui est tracé. Seule la
  * valeur de fin est étiquetée ; l'axe implicite est le cap, tracé en filet.
  */
-function TempoChart({ config, history }) {
+function TempoChart({ config, history, stagnation }) {
   const W = 300
   const H = 68
   const PAD = 5
@@ -179,6 +179,9 @@ function TempoChart({ config, history }) {
       <p className="muted small">
         {history.length} séance{history.length > 1 ? 's' : ''} · dernière le {formatDateFR(end.date)}
         {atCap ? ` · cap atteint` : ''}
+        {stagnation?.stagnating ? (
+          <span className="stagnant"> · stagne depuis {stagnation.count} séances</span>
+        ) : null}
       </p>
     </figure>
   )

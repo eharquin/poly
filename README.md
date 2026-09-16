@@ -105,6 +105,11 @@ src/
   `sport-tool` : **3 passages propres d'affilée → +4 BPM** à la séance
   suivante, jusqu'au `capBpm` du bloc. Un passage raté ne fait pas redescendre
   le tempo, il remet seulement le compteur à zéro.
+- **Stagnation** — quand un bloc reste au même tempo sur 3 séances sans
+  atteindre son cap, l'écran du jour le signale et propose une piste de
+  déblocage (isoler 4-6 notes, très lentement, puis une salve courte à
+  vitesse maximale sur ces seules notes). C'est une indication d'usage, pas
+  une donnée du schéma — et une piste plausible, pas un résultat démontré.
 - **Paliers** — un palier est acquis quand *tous* ses blocs à tempo ont
   atteint leur cap et l'ont tenu (≥ 3 passages propres). Le palier suivant
   devient alors actif et ses blocs remplacent les précédents sur l'écran du

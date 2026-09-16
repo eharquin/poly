@@ -82,3 +82,39 @@ export function practisedExerciseIds(sessions) {
   }
   return [...ids]
 }
+
+/* ------------------------------------------------------------------ */
+/* Stagnation                                                          */
+/* ------------------------------------------------------------------ */
+
+// Nombre de séances au même tempo à partir duquel on considère qu'un bloc
+// bloque et qu'il faut changer d'approche plutôt que réessayer à l'identique.
+export const STAGNATION_SESSIONS = 3
+
+/**
+ * Technique de déblocage proposée quand un bloc stagne. Indication d'usage,
+ * pas une donnée du schéma. Formulée comme une piste à essayer : le
+ * raisonnement (alterner contrôle moteur lent guidé par rétroaction et salve
+ * balistique courte) est plausible, ce n'est pas un résultat à présenter
+ * comme démontré.
+ */
+export const STAGNATION_HINT =
+  'Piste de déblocage : isole 4-6 notes du passage, joue-les très lentement pour vérifier la propreté, ' +
+  'puis tente une salve courte à vitesse maximale sur ces seules notes avant de revenir au tempo cible du bloc entier.'
+
+/**
+ * Bloc coincé : les dernières séances se suivent au même tempo sans que le
+ * cap soit atteint. Renvoie le nombre de séances consécutives à ce tempo.
+ */
+export function getStagnation(sessions, exerciseId) {
+  const config = getBlockConfig(exerciseId)
+  if (!isTempoBlock(config)) return { stagnating: false, count: 0, tempoBpm: null }
+
+  const entries = getBlockEntries(sessions, exerciseId).filter((e) => typeof e.tempoBpm === 'number')
+  const last = entries.at(-1)
+  if (!last || last.tempoBpm >= config.capBpm) return { stagnating: false, count: 0, tempoBpm: null }
+
+  let count = 0
+  for (let i = entries.length - 1; i >= 0 && entries[i].tempoBpm === last.tempoBpm; i--) count++
+  return { stagnating: count >= STAGNATION_SESSIONS, count, tempoBpm: last.tempoBpm }
+}
