@@ -1,5 +1,5 @@
-import { pitchClassName } from '../lib/chordName.js'
-import { fretsPitchClasses } from '../lib/tones.js'
+import { pitchClassName } from '../../lib/chordName.js'
+import { fretsPitchClasses } from '../../lib/tones.js'
 import ChordDiagram from './ChordDiagram.jsx'
 
 /**

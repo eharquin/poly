@@ -1,6 +1,6 @@
 import { eq, done } from './eq.mjs'
 const P = new URL('../src', import.meta.url).pathname
-const { SCALE_CARDS, MODES, scaleNotes, noteName } = await import(`${P}/scales.js`)
+const { SCALE_CARDS, MODES, scaleNotes, noteName } = await import(`${P}/exercises/theory/scales.js`)
 const { rootPitchClass, spellOnLetter } = await import(`${P}/lib/chordName.js`)
 
 const names = (root, acc, mode) => scaleNotes(root, acc, mode).map(noteName).join(' ')

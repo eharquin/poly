@@ -1,4 +1,4 @@
-import { MODE_NAMES } from '../modes.js'
+import { MODE_NAMES } from './modes.js'
 
 /** Les sept modes de la gamme majeure, dans l'ordre des degrés. */
 export default function ModeSelector({ value, onChange }) {

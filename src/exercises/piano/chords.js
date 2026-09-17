@@ -4,8 +4,8 @@
 // donc pas de liste à la main. `keys` = demi-tons depuis le Do de l'octave
 // de la fondamentale, pour le clavier SVG.
 
-import { QUALITIES, formatChordName, rootPitchClass } from './lib/chordName.js'
-import { BUILDABLE, INTERVALS } from './lib/tones.js'
+import { QUALITIES, formatChordName, rootPitchClass } from '../../lib/chordName.js'
+import { BUILDABLE, INTERVALS } from '../../lib/tones.js'
 
 // Graphie usuelle des fondamentales : C# et F# en dièses, Eb / Ab / Bb en bémols.
 const ROOTS = [

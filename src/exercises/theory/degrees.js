@@ -3,7 +3,7 @@
 // diatonique, avec sa graphie correcte dans la tonalité (le IV de F est Bb,
 // pas A#). Partagée par les exercices « degré → accord » et « accord → degré ».
 
-import { LETTERS, rootPitchClass, spellOnLetter } from './lib/chordName.js'
+import { LETTERS, rootPitchClass, spellOnLetter } from '../../lib/chordName.js'
 
 // Ordre du cercle des quintes : dièses puis bémols. F# plutôt que Gb (E#dim
 // vaut Cb pour l'exotisme, et F# est plus fréquent à la guitare).

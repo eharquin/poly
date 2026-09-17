@@ -1,6 +1,6 @@
 import { eq, done } from './eq.mjs'
 const P = new URL('../src', import.meta.url).pathname
-const { MODE_PARENT_CARDS, MODE_NAME_CARDS, MODE_NAMES } = await import(`${P}/modes.js`)
+const { MODE_PARENT_CARDS, MODE_NAME_CARDS, MODE_NAMES } = await import(`${P}/exercises/theory/modes.js`)
 
 eq('sept modes dans l’ordre des degrés', MODE_NAMES, ['ionien', 'dorien', 'phrygien', 'lydien', 'mixolydien', 'éolien', 'locrien'])
 eq('90 cartes mode → mère, ids uniques', [MODE_PARENT_CARDS.length, new Set(MODE_PARENT_CARDS.map((c) => c.id)).size], [90, 90])

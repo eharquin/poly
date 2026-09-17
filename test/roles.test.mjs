@@ -1,6 +1,8 @@
 import { eq, done } from './eq.mjs'
 const P = new URL('../src', import.meta.url).pathname
-const { GUITAR_ROLE_CARDS, PIANO_ROLE_CARDS, ROLES, inversionKeys } = await import(`${P}/roles.js`)
+const { ROLES } = await import(`${P}/exercises/common/roles.js`)
+const { GUITAR_ROLE_CARDS } = await import(`${P}/exercises/guitar/roles.js`)
+const { PIANO_ROLE_CARDS, inversionKeys } = await import(`${P}/exercises/piano/roles.js`)
 
 const byId = (id) => GUITAR_ROLE_CARDS.find((c) => c.id === id)
 

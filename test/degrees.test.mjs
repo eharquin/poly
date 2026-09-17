@@ -1,6 +1,6 @@
 import { eq, done } from './eq.mjs'
 const P = new URL('../src', import.meta.url).pathname
-const { DEGREE_CARDS, DEGREE_SEVENTH_CARDS, MAJOR_KEYS, ROMANS, majorScaleChords } = await import(`${P}/degrees.js`)
+const { DEGREE_CARDS, DEGREE_SEVENTH_CARDS, MAJOR_KEYS, ROMANS, majorScaleChords } = await import(`${P}/exercises/theory/degrees.js`)
 const { formatChordName, rootPitchClass } = await import(`${P}/lib/chordName.js`)
 
 const names = (key, acc, opts) => majorScaleChords(key, acc, opts).map(formatChordName).join(' ')

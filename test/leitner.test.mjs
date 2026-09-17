@@ -3,7 +3,7 @@ const P = new URL('../src', import.meta.url).pathname
 const { QUALITIES, formatChordName, isComplete, sameChord, sameChordEnharmonic, rootPitchClass } = await import(`${P}/lib/chordName.js`)
 const { BOX_INTERVALS_DAYS, applyAnswer, applyAnswers, dueChords, isDue, pickChord, deckSummary, emptyStat } = await import(`${P}/lib/leitner.js`)
 const { applyOp, recordAnswers } = await import(`${P}/lib/ops.js`)
-const { PIANO_CHORDS, PIANO_BUILD_CHORDS } = await import(`${P}/pianoChords.js`)
+const { PIANO_CHORDS, PIANO_BUILD_CHORDS } = await import(`${P}/exercises/piano/chords.js`)
 const { INTERVALS, sameNotes, soundsLike, fretsPitchClasses, chordTones } = await import(`${P}/lib/tones.js`)
 
 // --- Noms ---

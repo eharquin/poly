@@ -3,7 +3,7 @@
 // table de théorie ci-dessous ne sert qu'ici — l'app ne raisonne pas sur les
 // notes, seulement sur les noms.
 import { readFileSync } from 'node:fs'
-const CHORDS = JSON.parse(readFileSync(new URL('../src/chords.json', import.meta.url), 'utf8'))
+const CHORDS = JSON.parse(readFileSync(new URL('../src/exercises/guitar/chords.json', import.meta.url), 'utf8'))
 const { QUALITIES, formatChordName } = await import(new URL('../src/lib/chordName.js', import.meta.url))
 
 const NAMES = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }

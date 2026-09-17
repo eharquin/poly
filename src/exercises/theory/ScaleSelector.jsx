@@ -1,4 +1,4 @@
-import { ACCIDENTALS } from '../lib/chordName.js'
+import { ACCIDENTALS } from '../../lib/chordName.js'
 
 /**
  * Les lettres de la gamme à partir de la tonique (la carte les donne : sept

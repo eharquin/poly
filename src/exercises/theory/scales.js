@@ -8,7 +8,7 @@
 // demandent une double altération (G# mineur harmonique : F##) sont
 // écartées, le sélecteur n'offre que ♮ / # / b.
 
-import { LETTERS, rootPitchClass, spellOnLetter } from './lib/chordName.js'
+import { LETTERS, rootPitchClass, spellOnLetter } from '../../lib/chordName.js'
 
 // `steps` : demi-tons depuis la tonique ; `letters` : pour chaque note, le
 // degré (0-6) dont elle prend la lettre — consécutifs par défaut, une sélection

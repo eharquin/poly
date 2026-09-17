@@ -2,8 +2,8 @@
 // pour « quelle note ? », et les 72 couples (corde, note) pour « où est cette
 // note ? ». Accordage standard, corde grave -> aiguë.
 
-import { pitchClassName } from './lib/chordName.js'
-import { STANDARD_TUNING } from './lib/tones.js'
+import { pitchClassName } from '../../lib/chordName.js'
+import { STANDARD_TUNING } from '../../lib/tones.js'
 
 export const FRETS = 12
 export const STRING_LABELS = ['Mi grave (6e)', 'La (5e)', 'Ré (4e)', 'Sol (3e)', 'Si (2e)', 'Mi aigu (1re)']

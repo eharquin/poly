@@ -1,4 +1,4 @@
-import { FRETS } from '../fretboard.js'
+import { FRETS } from './fretboard.js'
 
 /**
  * Manche horizontal, corde aiguë en haut comme sur une tablature : sillet à

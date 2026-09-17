@@ -1,6 +1,6 @@
 import { eq, done } from './eq.mjs'
 const P = new URL('../src', import.meta.url).pathname
-const { FRETBOARD_NOTE_CARDS, FRETBOARD_FIND_CARDS, FRETS } = await import(`${P}/fretboard.js`)
+const { FRETBOARD_NOTE_CARDS, FRETBOARD_FIND_CARDS, FRETS } = await import(`${P}/exercises/guitar/fretboard.js`)
 
 const note = (s, f) => FRETBOARD_NOTE_CARDS.find((c) => c.string === s && c.fret === f)
 const find = (s, name) => FRETBOARD_FIND_CARDS.find((c) => c.string === s && c.name === name)

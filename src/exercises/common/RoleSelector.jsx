@@ -1,4 +1,4 @@
-import { ROLES } from '../roles.js'
+import { ROLES } from './roles.js'
 
 /** Fondamentale, tierce, quinte, septième. */
 export default function RoleSelector({ value, onChange }) {

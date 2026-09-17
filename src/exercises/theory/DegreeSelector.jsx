@@ -1,4 +1,4 @@
-import { ROMANS } from '../degrees.js'
+import { ROMANS } from './degrees.js'
 
 /** Sept boutons, un par degré de la gamme majeure. */
 export default function DegreeSelector({ value, onChange }) {

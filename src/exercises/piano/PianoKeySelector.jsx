@@ -1,4 +1,4 @@
-import { pitchClassName } from '../lib/chordName.js'
+import { pitchClassName } from '../../lib/chordName.js'
 import PianoDiagram from './PianoDiagram.jsx'
 
 /** Deux octaves cliquables ; la sélection est la liste des touches allumées. */

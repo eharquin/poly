@@ -1,4 +1,4 @@
-import { NOTE_NAMES_BOTH } from '../lib/chordName.js'
+import { NOTE_NAMES_BOTH } from '../../lib/chordName.js'
 
 /** Douze classes de hauteur, les deux graphies sur une même pastille. */
 export default function NoteSelector({ value, onChange }) {

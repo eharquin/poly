@@ -1,12 +1,13 @@
-import { ACCIDENTALS, NOTES } from '../lib/chordName.js'
+import { ACCIDENTALS, NOTES, QUALITIES, formatChordName } from '../../lib/chordName.js'
 
-/** Une tonalité : note + altération, avec l'aperçu. */
-export default function KeySelector({ value, onChange }) {
+/** Trois groupes de boutons (note, altération, qualité) et l'aperçu du nom construit. */
+export default function ChordSelector({ value, onChange }) {
   const set = (patch) => onChange({ ...value, ...patch })
+  const name = formatChordName(value)
   return (
-    <div>
+    <div className="chord-selector">
       <div className="chord-preview mono" aria-live="polite">
-        {value.root ? `${value.root}${value.acc ?? ''} majeur` : '…'}
+        {name || '…'}
       </div>
       <span className="field-label">Note</span>
       <div className="chips">
@@ -21,6 +22,14 @@ export default function KeySelector({ value, onChange }) {
         {ACCIDENTALS.map((a) => (
           <button key={a.value} type="button" className={`chip ${value.acc === a.value ? 'active' : ''}`} onClick={() => set({ acc: a.value })}>
             {a.label}
+          </button>
+        ))}
+      </div>
+      <span className="field-label">Qualité</span>
+      <div className="chips">
+        {QUALITIES.map((q) => (
+          <button key={q} type="button" className={`chip ${value.qual === q ? 'active' : ''}`} onClick={() => set({ qual: q })}>
+            {q}
           </button>
         ))}
       </div>

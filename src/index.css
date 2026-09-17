@@ -553,3 +553,22 @@ details.card > summary {
   padding: 0 8px;
   font-size: 0.85rem;
 }
+
+/* Liste des exercices, par catégorie */
+.category-title {
+  margin: 18px 0 8px;
+  color: var(--text-2);
+}
+.card.exercise {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.card.exercise:active {
+  background: var(--bg-3);
+}
