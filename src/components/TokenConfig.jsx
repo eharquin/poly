@@ -1,10 +1,8 @@
 import { useState } from 'react'
-import { CIRCLE_OF_FIFTHS, KEY_CYCLE_WEEKS } from '../config/instruments.js'
-import { getKeyOfWeek, toISO, mondayOf } from '../lib/cycle.js'
 import { testConnection } from '../lib/github.js'
 import { isConfigured } from '../lib/storage.js'
 
-/** Réglages : repo de données, token GitHub, départ du cycle de tonalités. */
+/** Réglages : repo de données et token GitHub. */
 export default function TokenConfig({ settings, onChange, onSaved }) {
   const [form, setForm] = useState(settings)
   const [status, setStatus] = useState(null)
@@ -58,7 +56,7 @@ export default function TokenConfig({ settings, onChange, onSaved }) {
             <input value={form.path} onChange={set('path')} autoCapitalize="none" />
           </label>
         </div>
-        <p className="muted small">Repo privé conseillé : le fichier contient tout l'historique de pratique.</p>
+        <p className="muted small">Repo privé conseillé : le fichier contient toutes tes statistiques.</p>
       </section>
 
       <section className="card">
@@ -85,30 +83,6 @@ export default function TokenConfig({ settings, onChange, onSaved }) {
           <span>Date d'expiration du token (alerte 7 jours avant)</span>
           <input type="date" value={form.tokenExpires ?? ''} onChange={set('tokenExpires')} />
         </label>
-      </section>
-
-      <section className="card">
-        <h3>Cycle des tonalités</h3>
-        <p className="muted small">
-          Une tonalité du cercle des quintes toutes les {KEY_CYCLE_WEEKS} semaines, dans l'ordre{' '}
-          {CIRCLE_OF_FIFTHS.join(' → ')}.
-        </p>
-        <label className="field">
-          <span>Date de départ (lundi de la 1re tonalité)</span>
-          <input type="date" value={form.cycleStart} onChange={set('cycleStart')} />
-        </label>
-        <button
-          type="button"
-          className="btn-link"
-          onClick={() => setForm((f) => ({ ...f, cycleStart: toISO(mondayOf(new Date())) }))}
-        >
-          Démarrer au lundi de cette semaine
-        </button>
-        {form.cycleStart && (
-          <p className="muted small">
-            Tonalité en cours avec ce réglage : <strong>{getKeyOfWeek(new Date(), form.cycleStart)}</strong>
-          </p>
-        )}
       </section>
 
       {status && <div className={`notice ${status.ok === false ? 'error' : status.ok ? 'ok' : ''}`}>{status.msg}</div>}

@@ -1,7 +1,7 @@
 :root {
   color-scheme: dark;
   --bg: #111418;
-  --bg-2: #1b2027; /* surface des cartes = surface des graphiques */
+  --bg-2: #1b2027; /* surface des cartes */
   --bg-3: #252c35;
   --border: #2f3842;
   --text: #f2f4f6;
@@ -9,13 +9,9 @@
   --muted-ink: #898781;
   --accent: #a78bfa; /* chrome de l'app (boutons, nav) — jamais une donnée */
   --accent-text: #1a1030;
-  /* Couleur de donnée : slot violet foncé, validé sur --bg-2 (bande de
-     luminosité, chroma, CVD, contraste >= 3:1). */
-  --data: #9085e9;
-  /* Palette de statut réservée — jamais réutilisée pour une série. */
+  --data: #9085e9; /* liens et mises en avant, distinct du chrome */
   --status-good: #0ca30c;
   --status-warning: #fab219;
-  --status-serious: #ec835a;
   --status-critical: #d03b3b;
   --tap: 48px;
 }
@@ -158,205 +154,12 @@ main {
   font-size: 1.3rem;
 }
 
-/* Bandeau séance du jour */
-.banner {
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-  background: var(--bg-3);
-  border-left: 4px solid var(--accent);
-}
-.banner-main,
-.banner-key {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-.banner-key {
-  text-align: right;
-  flex: 0 0 auto;
-}
-.banner-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-2);
-}
-.banner-main strong {
-  font-size: 1.1rem;
-}
-.banner-key strong {
-  font-size: 1.6rem;
-  color: var(--accent);
-  line-height: 1.1;
-}
-
-.suggestions {
-  list-style: none;
-  margin: 0 0 12px;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 0.9rem;
-}
-.tag {
-  display: inline-block;
-  background: var(--bg-3);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 1px 8px;
-  font-size: 0.72rem;
-  color: var(--accent);
-  margin-right: 6px;
-}
-.tag-habit {
-  color: var(--data);
-}
-
-.session-head {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 12px;
-}
-.date-input {
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  min-height: var(--tap);
-  flex: 1;
-  min-width: 0;
-}
-
-/* Pills instrument */
-.pills {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-.pill {
-  flex: 1;
-  min-height: var(--tap);
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--bg-3);
-  color: var(--text-2);
-  font-weight: 600;
-}
-.pill.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-text);
-}
-
-/* Blocs de la séance */
-.blocks {
-  list-style: none;
-  margin: 0 0 4px;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.block {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--bg-3);
-}
-.block.done {
-  border-color: var(--accent);
-}
-.block-head {
-  width: 100%;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  background: none;
-  border: none;
-  padding: 10px 12px;
-  min-height: var(--tap);
-  text-align: left;
-}
-.check {
-  flex: 0 0 24px;
-  height: 24px;
-  border-radius: 7px;
-  border: 1px solid var(--border);
-  background: var(--bg-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  margin-top: 2px;
-}
-.check.on {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-text);
-  font-weight: 700;
-}
-.block-label {
-  flex: 1;
-  min-width: 0;
-  font-size: 0.95rem;
-}
-.block-body {
-  padding: 0 12px 12px;
-  border-top: 1px solid var(--border);
-  padding-top: 10px;
-}
+/* Sélecteur : libellé de groupe et pastilles */
 .field-label {
   display: block;
   font-size: 0.78rem;
   color: var(--text-2);
   margin-bottom: 6px;
-}
-.tempo-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-.tempo-row .field-label {
-  margin: 0;
-  flex: 0 0 auto;
-}
-.stepper {
-  display: flex;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--bg-2);
-}
-.stepper button {
-  flex: 0 0 40px;
-  min-height: 44px;
-  border: none;
-  background: var(--bg-2);
-  font-size: 1.3rem;
-  touch-action: manipulation;
-}
-.stepper button:active {
-  background: var(--accent);
-  color: var(--accent-text);
-}
-.stepper input {
-  width: 68px;
-  min-height: 44px;
-  border: none;
-  background: var(--bg-2);
-  text-align: center;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
 }
 .chips {
   display: flex;
@@ -378,18 +181,6 @@ main {
   border-color: var(--accent);
   color: var(--accent-text);
   font-weight: 600;
-}
-.block-note {
-  width: 100%;
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  min-height: 44px;
-}
-.block-notes {
-  margin: 8px 0 0;
-  padding-left: 18px;
 }
 
 /* Formulaires */
@@ -464,63 +255,16 @@ main {
   padding: 8px 0;
   font-size: 0.9rem;
 }
-.danger-text {
-  color: var(--status-critical) !important;
-}
 
-/* Listes de séances */
-.session-lines {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.session-lines li {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+/* Ligne d'en-tête d'une carte : libellé à gauche, compteur à droite */
 .line-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 10px;
 }
-.session-item .btn-link {
-  margin-top: 4px;
-}
 
-/* Diagnostics (adhérence, paliers, fraîcheur) : une ligne = libellé, chiffre,
-   état. L'état porte toujours une icône + un mot, jamais la couleur seule. */
-.diagnostic {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.diagnostic li {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 2px 10px;
-  align-items: baseline;
-  font-size: 0.95rem;
-}
-.diag-label {
-  min-width: 0;
-}
-.diag-count {
-  color: var(--text-2);
-  text-align: right;
-}
-.diag-status {
-  grid-column: 1 / -1;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
+/* Statuts : toujours accompagnés d'un chiffre ou d'un mot, jamais la couleur seule */
 .status-ok {
   color: var(--status-good);
 }
@@ -529,93 +273,6 @@ main {
 }
 .status-low {
   color: var(--status-critical);
-}
-.status-high {
-  color: var(--text-2);
-}
-.fresh-ok {
-  color: var(--status-good);
-}
-.fresh-warn {
-  color: var(--status-warning);
-}
-.fresh-stale {
-  color: var(--status-serious);
-}
-.fresh-never {
-  color: var(--text-2);
-}
-
-/* Courbes de tempo : une seule série par graphique, donc pas de légende —
-   le titre nomme l'exercice, seule la valeur de fin est étiquetée. */
-.chart {
-  margin: 0 0 18px;
-}
-.chart figcaption {
-  font-size: 0.9rem;
-  margin-bottom: 4px;
-}
-.chart p {
-  margin: 2px 0 0;
-}
-.chart-line {
-  fill: none;
-  stroke: var(--data);
-  stroke-width: 2;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-.chart-dot {
-  fill: var(--data);
-  stroke: var(--bg-2); /* anneau de surface : le point reste lisible sur la ligne */
-  stroke-width: 2;
-}
-.chart-cap {
-  stroke: var(--muted-ink);
-  stroke-width: 1;
-}
-.chart-tick {
-  fill: var(--muted-ink);
-  font-size: 10px;
-}
-.chart-value {
-  fill: var(--text); /* le texte ne porte jamais la couleur de la donnée */
-  font-size: 12px;
-  font-weight: 600;
-}
-
-/* Calendrier */
-.calendar {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.cal-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  justify-items: center;
-}
-.cal-dow {
-  font-size: 0.72rem;
-  color: var(--text-2);
-}
-.cal-day {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--bg-3);
-}
-.cal-active {
-  background: var(--data);
-}
-.cal-future {
-  background: transparent;
-  border: 1px dashed var(--border);
-}
-.cal-today {
-  outline: 2px solid var(--text-2);
-  outline-offset: 2px;
 }
 
 /* Notices */
@@ -639,7 +296,7 @@ main {
   margin: 8px 12px 0;
 }
 
-/* Tables (détail des blocs dans l'historique) */
+/* Tables (stats par accord) */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -656,26 +313,12 @@ main {
   white-space: nowrap;
 }
 
-/* Indication de déblocage, affichée seulement sur un bloc qui stagne. */
-.hint {
-  margin: 0 0 10px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--bg-2);
-  border-left: 3px solid var(--status-serious);
-  font-size: 0.85rem;
-  line-height: 1.35;
-}
-.stagnant {
-  color: var(--status-serious);
-}
-
-/* Exercices — grille d'accord */
+/* Accords — grille */
 .chord {
-  width: 160px;
+  width: 170px;
   max-width: 100%;
   display: block;
-  margin: 0 auto;
+  margin: 8px auto 4px;
 }
 .chord-string,
 .chord-fret {
@@ -690,24 +333,13 @@ main {
 .chord-dot {
   fill: var(--text);
 }
-.chord-dot.root {
-  fill: var(--data);
-}
 .chord-mark {
   fill: var(--text-2);
   font-size: 13px;
   text-anchor: middle;
 }
-.chord-mark.root {
-  fill: var(--data);
-  font-weight: 700;
-}
-.chord-pos {
-  fill: var(--text-2);
-  font-size: 11px;
-}
 
-/* Exercices — écran */
+/* Accords — écran de jeu */
 .boxes {
   display: flex;
   gap: 6px;
@@ -723,9 +355,6 @@ main {
   background: var(--bg-3);
   border: 1px solid var(--border);
 }
-.box-new {
-  border-style: dashed;
-}
 .box-count {
   font-weight: 600;
 }
@@ -733,57 +362,46 @@ main {
   font-size: 0.7rem;
   color: var(--text-2);
 }
-.drill-prompt {
-  padding: 8px 0 4px;
-}
-.drill-question {
+.chord-preview {
   text-align: center;
-  margin: 8px 0 12px;
-  font-size: 1.05rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  min-height: 2.2rem;
+  margin: 4px 0 8px;
 }
-.chips.roots .chip {
-  padding: 0 8px;
-  min-width: 44px;
-  font-size: 0.85rem;
-}
-.verdict {
+.game-feedback {
+  display: flex;
+  gap: 12px;
+  align-items: center;
   border-radius: 12px;
-  padding: 12px;
+  padding: 10px 12px;
+  margin: 8px 0;
   background: var(--bg-3);
   border-left: 4px solid var(--status-good);
 }
-.verdict.wrong {
+.game-feedback.wrong {
   border-left-color: var(--status-critical);
 }
-.verdict-head {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  margin-bottom: 10px;
+.game-feedback strong {
+  font-size: 1.2rem;
 }
-.verdict-head strong {
-  font-size: 1.3rem;
-}
-.verdict-icon {
-  font-size: 1.6rem;
+.feedback-icon {
+  font-size: 1.5rem;
   line-height: 1;
   font-weight: 700;
   color: var(--status-good);
 }
-.verdict.wrong .verdict-icon {
+.game-feedback.wrong .feedback-icon {
   color: var(--status-critical);
 }
-.facts {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.95rem;
+details.card > summary {
+  cursor: pointer;
+  font-weight: 600;
 }
-.facts .muted {
-  display: inline-block;
-  min-width: 110px;
-  font-size: 0.85rem;
+.table th {
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-2);
 }

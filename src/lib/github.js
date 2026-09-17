@@ -3,7 +3,7 @@
 
 const API = 'https://api.github.com'
 
-export const EMPTY_DATA = { sessions: [] }
+export const EMPTY_DATA = { chordStats: {} }
 
 function headers(token) {
   return {
@@ -48,8 +48,8 @@ async function handle(res) {
 /**
  * Lit data.json. Retourne { data, sha } ; sha = null si le fichier n'existe
  * pas encore. Les clés inconnues du fichier sont conservées telles quelles :
- * une phase ultérieure peut ajouter ses propres sections sans qu'un client
- * plus ancien les efface au prochain commit.
+ * un futur exercice peut ajouter sa propre section sans qu'un client plus
+ * ancien l'efface au prochain commit.
  */
 export async function fetchData(settings) {
   const url = `${contentsUrl(settings)}?ref=${encodeURIComponent(settings.branch)}`
@@ -58,7 +58,7 @@ export async function fetchData(settings) {
   const json = await handle(res)
   const parsed = JSON.parse(decodeBase64(json.content))
   return {
-    data: { ...parsed, sessions: parsed.sessions ?? [] },
+    data: { ...parsed, chordStats: parsed.chordStats ?? {} },
     sha: json.sha,
   }
 }

@@ -1,8 +1,5 @@
 const TABS = [
-  { key: 'today', label: "Aujourd'hui", icon: '🎹' },
-  { key: 'drill', label: 'Exercices', icon: '🃏' },
-  { key: 'progress', label: 'Progression', icon: '📈' },
-  { key: 'history', label: 'Historique', icon: '📅' },
+  { key: 'exercises', label: 'Exercices', icon: '🎸' },
   { key: 'settings', label: 'Réglages', icon: '⚙️' },
 ]
 

@@ -1,19 +1,24 @@
 import { useState } from 'react'
-import DrillScreen from './components/DrillScreen.jsx'
-import HistoryScreen from './components/HistoryScreen.jsx'
+import GameScreen from './components/GameScreen.jsx'
 import Nav from './components/Nav.jsx'
-import ProgressScreen from './components/ProgressScreen.jsx'
-import TodayScreen from './components/TodayScreen.jsx'
 import TokenConfig from './components/TokenConfig.jsx'
 import { useData } from './hooks/useData.js'
 import { useSettings } from './hooks/useSettings.js'
-import { daysUntil } from './lib/cycle.js'
 import { isConfigured } from './lib/storage.js'
+
+/** Jours entre aujourd'hui et une date ISO (négatif si passée), ou null. */
+function daysUntil(iso) {
+  if (!iso) return null
+  const [y, m, d] = iso.split('-').map(Number)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return Math.round((new Date(y, m - 1, d) - today) / 86400000)
+}
 
 export default function App() {
   const [settings, updateSettings] = useSettings()
   const configured = isConfigured(settings)
-  const [tab, setTab] = useState(configured ? 'today' : 'settings')
+  const [tab, setTab] = useState(configured ? 'exercises' : 'settings')
   const { data, loading, error, lastSync, online, pending, refresh, commit } = useData(settings)
 
   return (
@@ -43,21 +48,13 @@ export default function App() {
       <TokenExpiryNotice days={daysUntil(settings.tokenExpires)} onOpen={() => setTab('settings')} />
 
       <main>
-        {tab === 'today' &&
+        {tab === 'exercises' &&
           (configured ? (
-            <TodayScreen data={data} settings={settings} onCommit={commit} />
+            <GameScreen data={data} onCommit={commit} />
           ) : (
             <NeedConfig go={() => setTab('settings')} />
           ))}
-        {tab === 'drill' &&
-          (configured ? (
-            <DrillScreen data={data} settings={settings} onCommit={commit} />
-          ) : (
-            <NeedConfig go={() => setTab('settings')} />
-          ))}
-        {tab === 'progress' && <ProgressScreen data={data} />}
-        {tab === 'history' && <HistoryScreen data={data} onCommit={commit} />}
-        {tab === 'settings' && <TokenConfig settings={settings} onChange={updateSettings} onSaved={() => setTab('today')} />}
+        {tab === 'settings' && <TokenConfig settings={settings} onChange={updateSettings} onSaved={() => setTab('exercises')} />}
       </main>
 
       <Nav current={tab} onChange={setTab} />

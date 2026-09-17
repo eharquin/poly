@@ -1,11 +1,10 @@
 // Tout ce qui vit dans le localStorage : réglages (dont le token), cache des
-// données, brouillon de log et file d'attente des écritures hors-ligne.
+// données, partie en cours et file d'attente des écritures hors-ligne.
 
 const KEYS = {
   settings: 'poly.settings',
   cache: 'poly.data-cache',
-  draft: 'poly.draft',
-  drillDraft: 'poly.drill-draft',
+  gameDraft: 'poly.game-draft',
   pending: 'poly.pending',
 }
 
@@ -15,7 +14,6 @@ const DEFAULT_SETTINGS = {
   repo: '',
   branch: 'main',
   path: 'data.json',
-  cycleStart: '', // départ du cercle des quintes (lundi de la 1re tonalité)
   tokenExpires: '', // date d'expiration du PAT (saisie manuelle) pour l'alerte
 }
 
@@ -43,16 +41,11 @@ export const saveSettings = (s) => write(KEYS.settings, s)
 export const loadCache = () => read(KEYS.cache, null)
 export const saveCache = (data) => write(KEYS.cache, data)
 
-// Brouillon du formulaire de log (instrument / minutes / note en cours de saisie)
-export const loadDraft = () => read(KEYS.draft, null)
-export const saveDraft = (d) => write(KEYS.draft, d)
-export const clearDraft = () => write(KEYS.draft, null)
-
-// Série d'exercices en cours (file, position, réponses) : on ne perd pas
-// une série commencée dans le métro parce que l'écran s'est verrouillé.
-export const loadDrillDraft = () => read(KEYS.drillDraft, null)
-export const saveDrillDraft = (d) => write(KEYS.drillDraft, d)
-export const clearDrillDraft = () => write(KEYS.drillDraft, null)
+// Partie en cours (accord affiché, réponses non encore commitées) : on ne
+// perd pas une partie commencée dans le métro parce que l'écran s'est verrouillé.
+export const loadGameDraft = () => read(KEYS.gameDraft, null)
+export const saveGameDraft = (d) => write(KEYS.gameDraft, d)
+export const clearGameDraft = () => write(KEYS.gameDraft, null)
 
 // File d'attente des écritures non synchronisées : [{ id, op, message, createdAt }]
 export const loadPending = () => read(KEYS.pending, [])

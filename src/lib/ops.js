@@ -1,48 +1,22 @@
 // Opérations d'écriture sérialisables (pour la file d'attente hors-ligne).
 // Chaque op est un objet JSON ; `applyOp` la rejoue sur une copie des données.
-//
-// Une séance est identifiée par son `id` (et non par date+instrument) : rien
-// n'interdit deux séances du même instrument le même jour, et les champs des
-// phases suivantes (drillId, tempsMs, tempo, boxLeitner…) se rangeront dans
-// le même objet sans changer ces opérations.
+// Un futur exercice ajoute son op ici et sa section dans data.json.
 
-/** Identifiant court et trié chronologiquement (base36 du temps + aléa). */
-export function newSessionId() {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
-}
+import { applyAnswers } from './leitner.js'
 
-export function upsertSession(session) {
-  return { type: 'upsertSession', session }
-}
-
-export function deleteSession(id) {
-  return { type: 'deleteSession', id }
-}
-
-/** Remplace toutes les séances (import d'une sauvegarde JSON). */
-export function replaceSessions(sessions) {
-  return { type: 'replaceSessions', sessions }
-}
-
-function sortSessions(sessions) {
-  return sessions.sort((a, b) => a.date.localeCompare(b.date) || String(a.id).localeCompare(String(b.id)))
-}
-
-/** Ordre canonique de lecture des séances (le même qu'à l'écriture). */
-export function sortedSessions(sessions) {
-  return sortSessions([...sessions])
+/**
+ * Enregistre les réponses d'une partie dans `chordStats` :
+ * [{ chordId, attempts, timeMs, at }]. `at` est fixé à la réponse, pas au
+ * commit, pour qu'une op rejouée hors-ligne garde sa date.
+ */
+export function recordChordAnswers(answers) {
+  return { type: 'recordChordAnswers', answers }
 }
 
 export function applyOp(data, op) {
   switch (op.type) {
-    case 'upsertSession':
-      data.sessions = sortSessions([...data.sessions.filter((s) => s.id !== op.session.id), op.session])
-      return data
-    case 'deleteSession':
-      data.sessions = data.sessions.filter((s) => s.id !== op.id)
-      return data
-    case 'replaceSessions':
-      data.sessions = sortSessions([...op.sessions])
+    case 'recordChordAnswers':
+      data.chordStats = applyAnswers(data.chordStats, op.answers)
       return data
     default:
       return data

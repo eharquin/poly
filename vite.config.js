@@ -11,9 +11,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
       manifest: {
-        name: 'Poly - Carnet de pratique',
+        name: 'Poly - Exercices de musique',
         short_name: 'Poly',
-        description: 'Carnet de pratique multi-instruments, données versionnées sur GitHub',
+        description: 'Exercices de théorie musicale en répétition espacée, données versionnées sur GitHub',
         start_url: './',
         scope: './',
         display: 'standalone',
