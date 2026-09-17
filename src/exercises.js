@@ -7,6 +7,9 @@ import ChordDiagram from './components/ChordDiagram.jsx'
 import ChordSelector from './components/ChordSelector.jsx'
 import { ChordToDegreePrompt, DegreeToChordPrompt } from './components/DegreePrompt.jsx'
 import DegreeSelector from './components/DegreeSelector.jsx'
+import { FretboardFindPrompt, FretboardNotePrompt } from './components/FretboardPrompt.jsx'
+import FretboardSelector from './components/FretboardSelector.jsx'
+import NoteSelector from './components/NoteSelector.jsx'
 import { GuitarBuildPrompt, PianoBuildPrompt } from './components/BuildPrompt.jsx'
 import ChordGridSelector from './components/ChordGridSelector.jsx'
 import PianoDiagram from './components/PianoDiagram.jsx'
@@ -16,7 +19,8 @@ import RoleSelector from './components/RoleSelector.jsx'
 import { ScalePrompt } from './components/ScalePrompt.jsx'
 import ScaleSelector from './components/ScaleSelector.jsx'
 import { DEGREE_CARDS, DEGREE_SEVENTH_CARDS } from './degrees.js'
-import { EMPTY_SELECTION, formatChordName, isComplete, pitchClassName, sameChord, sameChordEnharmonic } from './lib/chordName.js'
+import { FRETBOARD_FIND_CARDS, FRETBOARD_NOTE_CARDS } from './fretboard.js'
+import { EMPTY_SELECTION, NOTE_NAMES_BOTH, formatChordName, isComplete, pitchClassName, sameChord, sameChordEnharmonic } from './lib/chordName.js'
 import { BUILDABLE, fretsPitchClasses, sameNotes, soundsLike } from './lib/tones.js'
 import { PIANO_BUILD_CHORDS, PIANO_CHORDS } from './pianoChords.js'
 import { GUITAR_ROLE_CARDS, PIANO_ROLE_CARDS, roleLabel } from './roles.js'
@@ -44,6 +48,9 @@ const SCALE_ANSWER = {
   format: (s, card) => card.letters.map((l, i) => `${l}${s.accs[i] ?? '?'}`).join(' '),
 }
 const scaleLabel = (c) => `${c.name} : ${c.notes.map(noteName).join(' ')}${c.parent ? ` (${c.parent} majeur)` : ''}`
+const NOTE_ANSWER = { Selector: NoteSelector, empty: { pc: null }, isComplete: (s) => s.pc !== null, format: (s) => NOTE_NAMES_BOTH[s.pc] }
+const FRET_ANSWER = { Selector: FretboardSelector, empty: { fret: null }, isComplete: (s) => s.fret !== null, format: (s) => (s.fret === 0 ? 'à vide' : `case ${s.fret}`) }
+const fretLabel = (f) => (f === 0 ? 'à vide' : `case ${f}`)
 const KEYS_ANSWER = {
   Selector: PianoKeySelector,
   empty: { keys: [] },
@@ -113,6 +120,36 @@ export const EXERCISES = [
     answer: KEYS_ANSWER,
     matches: (sel, card) => sameNotes(sel.keys, card.keys),
     formatCard: (c) => c.name,
+  },
+  {
+    id: 'fretboard-note',
+    label: 'Note sur le manche',
+    instrument: 'Guitare',
+    icon: '🎸',
+    hint: 'Une case marquée sur le manche (12 cases) : quelle note ? A# et Bb sont acceptés indifféremment.',
+    unit: 'position',
+    cards: FRETBOARD_NOTE_CARDS,
+    section: 'fretboardNoteStats',
+    Prompt: FretboardNotePrompt,
+    question: 'Quelle note ?',
+    answer: NOTE_ANSWER,
+    matches: (sel, card) => sel.pc === card.pc,
+    formatCard: (c) => `${c.stringLabel} · ${fretLabel(c.fret)} : ${c.name}`,
+  },
+  {
+    id: 'fretboard-find',
+    label: 'Trouver la note',
+    instrument: 'Guitare',
+    icon: '🎸',
+    hint: 'Une corde et une note : tape la case. Toute case juste compte (le E de la corde de Mi est à vide et en 12).',
+    unit: 'position',
+    cards: FRETBOARD_FIND_CARDS,
+    section: 'fretboardFindStats',
+    Prompt: FretboardFindPrompt,
+    question: 'Quelle case ?',
+    answer: FRET_ANSWER,
+    matches: (sel, card) => card.frets.includes(sel.fret),
+    formatCard: (c) => `${c.name} sur ${c.stringLabel} : ${c.frets.map(fretLabel).join(' / ')}`,
   },
   {
     id: 'guitar-role',

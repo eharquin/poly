@@ -510,3 +510,46 @@ details.card > summary {
   font-weight: 600;
   color: var(--text-2);
 }
+
+/* Manche horizontal */
+.fretboard {
+  width: 100%;
+  max-width: 420px;
+  display: block;
+  margin: 8px auto 4px;
+}
+.fretboard.interactive {
+  touch-action: manipulation;
+}
+.fret-wire {
+  stroke: var(--muted-ink);
+  stroke-width: 1;
+}
+.fret-nut {
+  stroke: var(--text);
+  stroke-width: 4;
+}
+.fret-string {
+  stroke: var(--text-2);
+}
+.fret-string.dim {
+  opacity: 0.3;
+}
+.fret-inlay {
+  fill: var(--bg-3);
+  stroke: var(--border);
+}
+.fret-number {
+  fill: var(--text-2);
+  font-size: 9px;
+  text-anchor: middle;
+}
+.fret-dot {
+  fill: var(--status-warning);
+  stroke: #111418;
+  stroke-width: 1.5;
+}
+.chips.notes .chip {
+  padding: 0 8px;
+  font-size: 0.85rem;
+}

@@ -64,6 +64,9 @@ export function rootPitchClass(root, acc) {
 const PC_NAMES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B']
 export const pitchClassName = (pc) => PC_NAMES[((pc % 12) + 12) % 12]
 
+// Les deux graphies quand il y en a deux : "C#/Db".
+export const NOTE_NAMES_BOTH = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B']
+
 /** Même accord à la graphie près : A#m = Bbm. */
 export function sameChordEnharmonic(a, b) {
   return rootPitchClass(a.root, a.acc) === rootPitchClass(b.root, b.acc) && a.qual === b.qual
