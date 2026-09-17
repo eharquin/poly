@@ -18,7 +18,7 @@ export default function ExercisesScreen({ data, onOpen }) {
             </div>
             <p className="muted small">{ex.hint}</p>
             <p className="muted small">
-              {s.seen}/{s.total} {ex.unit}s vu{ex.unit === 'carte' ? 'e' : ''}s
+              {s.seen}/{s.total} {ex.unit}s vu{ex.unit === 'accord' ? '' : 'e'}s
             </p>
             <div className="actions">
               <button type="button" className="btn primary" onClick={() => onOpen(ex.id)}>

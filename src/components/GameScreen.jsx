@@ -95,7 +95,7 @@ export default function GameScreen({ exercise, data, onCommit, onBack }) {
 
       <section className="card">
         <p className="muted small">
-          {summary.seen}/{summary.total} {unit}s vu{unit === 'carte' ? 'e' : ''}s · {summary.due} à revoir
+          {summary.seen}/{summary.total} {unit}s vu{unit === 'accord' ? '' : 'e'}s · {summary.due} à revoir
         </p>
         <div className="boxes" aria-label="Répartition par boîte">
           {Array.from({ length: BOXES }, (_, i) => i + 1).map((b) => (

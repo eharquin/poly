@@ -2,20 +2,25 @@
 // énoncé affiche), la section de data.json qui porte ses stats Leitner, un
 // énoncé (diagramme ou texte), un type de réponse et sa règle de comparaison.
 
-import CHORDS from './chords.json'
+import CHORDS from './chords.json' with { type: 'json' }
 import ChordDiagram from './components/ChordDiagram.jsx'
 import ChordSelector from './components/ChordSelector.jsx'
 import { ChordToDegreePrompt, DegreeToChordPrompt } from './components/DegreePrompt.jsx'
 import DegreeSelector from './components/DegreeSelector.jsx'
 import PianoDiagram from './components/PianoDiagram.jsx'
+import { GuitarRolePrompt, PianoRolePrompt } from './components/RolePrompt.jsx'
+import RoleSelector from './components/RoleSelector.jsx'
 import { DEGREE_CARDS, DEGREE_SEVENTH_CARDS } from './degrees.js'
 import { EMPTY_SELECTION, formatChordName, isComplete, sameChord, sameChordEnharmonic } from './lib/chordName.js'
 import { PIANO_CHORDS } from './pianoChords.js'
+import { GUITAR_ROLE_CARDS, PIANO_ROLE_CARDS, roleLabel } from './roles.js'
 
 // Types de réponse : le sélecteur, la sélection vide, quand elle est complète,
 // et comment l'afficher.
 const CHORD_ANSWER = { Selector: ChordSelector, empty: EMPTY_SELECTION, isComplete, format: formatChordName }
 const DEGREE_ANSWER = { Selector: DegreeSelector, empty: { roman: null }, isComplete: (s) => Boolean(s.roman), format: (s) => s.roman ?? '' }
+const ROLE_ANSWER = { Selector: RoleSelector, empty: { role: null }, isComplete: (s) => Boolean(s.role), format: (s) => roleLabel(s.role) }
+const sameRole = (sel, card) => sel.role === card.role
 
 const degreeLabel = (c) => `${c.key} · ${c.roman} · ${formatChordName(c)}`
 
@@ -49,6 +54,36 @@ export const EXERCISES = [
     answer: CHORD_ANSWER,
     matches: sameChordEnharmonic,
     formatCard: formatChordName,
+  },
+  {
+    id: 'guitar-role',
+    label: 'Rôle de la note',
+    instrument: 'Guitare',
+    icon: '🎸',
+    hint: 'La grille d’un accord nommé, une corde marquée : fondamentale, tierce, quinte ou septième ? On apprend quelle note sonne où.',
+    unit: 'note',
+    cards: GUITAR_ROLE_CARDS,
+    section: 'guitarRoleStats',
+    Prompt: GuitarRolePrompt,
+    question: 'Quel rôle ?',
+    answer: ROLE_ANSWER,
+    matches: sameRole,
+    formatCard: (c) => `${c.name} · ${c.stringLabel} · ${roleLabel(c.role).toLowerCase()}`,
+  },
+  {
+    id: 'piano-role',
+    label: 'Rôle de la note',
+    instrument: 'Piano',
+    icon: '🎹',
+    hint: 'Un accord renversé, sans son nom, une touche marquée : fondamentale, tierce, quinte ou septième ? On apprend à lire les renversements.',
+    unit: 'note',
+    cards: PIANO_ROLE_CARDS,
+    section: 'pianoRoleStats',
+    Prompt: PianoRolePrompt,
+    question: 'Quel rôle ?',
+    answer: ROLE_ANSWER,
+    matches: sameRole,
+    formatCard: (c) => `${c.name} · ${c.inversionLabel} · ${roleLabel(c.role).toLowerCase()}`,
   },
   {
     id: 'degree-to-chord',

@@ -2,6 +2,7 @@
  * Clavier en SVG, à partir d'un Do, sur deux octaves (trois si l'accord
  * déborde). `keys` = demi-tons depuis ce Do ; chaque touche jouée reçoit un
  * point. Rien ne trahit la fondamentale : le clavier commence toujours au Do.
+ * `highlightKey` met en évidence l'une des touches jouées.
  */
 const WK = 18 // largeur d'une touche blanche
 const WH = 72 // hauteur
@@ -20,7 +21,7 @@ const LAYOUT = [
   { white: 6 },
 ]
 
-export default function PianoDiagram({ card, label }) {
+export default function PianoDiagram({ card, label, highlightKey = null }) {
   const { keys } = card
   const octaves = Math.max(2, Math.ceil((Math.max(...keys) + 1) / 12))
   const whites = octaves * 7
@@ -37,9 +38,9 @@ export default function PianoDiagram({ card, label }) {
     if (l.black) {
       const x = whiteX(octave, l.after) + WK - BK / 2
       blacks.push(<rect key={`b${semis}`} x={x} y={PAD} width={BK} height={BH} className="piano-black" />)
-      if (played.has(semis)) dots.push(<circle key={`d${semis}`} cx={x + BK / 2} cy={BH - 8} r={4.5} className="piano-dot" />)
+      if (played.has(semis)) dots.push(<circle key={`d${semis}`} cx={x + BK / 2} cy={BH - 8} r={4.5} className={`piano-dot ${semis === highlightKey ? 'hl' : ''}`} />)
     } else if (played.has(semis)) {
-      dots.push(<circle key={`d${semis}`} cx={whiteX(octave, l.white) + WK / 2} cy={PAD + WH - 12} r={5.5} className="piano-dot" />)
+      dots.push(<circle key={`d${semis}`} cx={whiteX(octave, l.white) + WK / 2} cy={PAD + WH - 12} r={5.5} className={`piano-dot ${semis === highlightKey ? 'hl' : ''}`} />)
     }
   }
 

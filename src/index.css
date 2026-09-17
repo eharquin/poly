@@ -444,3 +444,15 @@ details.card > summary {
 .text-prompt strong {
   font-size: 1.3rem;
 }
+
+/* Note mise en évidence (exercice « rôle de la note ») */
+.chord-dot.hl,
+.piano-dot.hl {
+  fill: var(--status-warning);
+  stroke: #111418;
+  stroke-width: 1.5;
+}
+.chord-mark.hl {
+  fill: var(--status-warning);
+  font-weight: 700;
+}

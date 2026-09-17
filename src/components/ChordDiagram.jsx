@@ -3,6 +3,7 @@
  * sillet en trait épais en haut, × / ○ au-dessus des cordes étouffées / à
  * vide, points pleins aux positions à jouer. Un `barre` { fret, from, to }
  * est dessiné comme une barre entre les cordes `from` et `to`.
+ * `highlightString` met en évidence la note d'une corde (point ou ○).
  */
 const STRINGS = 6
 const FRETS_SHOWN = 5
@@ -13,7 +14,7 @@ const DY = 28 // hauteur d'une case
 const W = X0 * 2 + DX * (STRINGS - 1)
 const H = Y0 + DY * FRETS_SHOWN + 8
 
-export default function ChordDiagram({ card, label }) {
+export default function ChordDiagram({ card, label, highlightString = null }) {
   const { frets, barre } = card
   const x = (string) => X0 + string * DX
   const y = (fret) => Y0 + (fret - 1) * DY + DY / 2
@@ -29,7 +30,7 @@ export default function ChordDiagram({ card, label }) {
       ))}
       {frets.map((f, i) =>
         f === null || f === 0 ? (
-          <text key={`m${i}`} x={x(i)} y={Y0 - 12} className="chord-mark">
+          <text key={`m${i}`} x={x(i)} y={Y0 - 12} className={`chord-mark ${f === 0 && i === highlightString ? 'hl' : ''}`}>
             {f === null ? '×' : '○'}
           </text>
         ) : null,
@@ -44,7 +45,11 @@ export default function ChordDiagram({ card, label }) {
           className="chord-dot"
         />
       )}
-      {frets.map((f, i) => (f && !inBarre(i, f) ? <circle key={`d${i}`} cx={x(i)} cy={y(f)} r={7.5} className="chord-dot" /> : null))}
+      {frets.map((f, i) =>
+        f && (!inBarre(i, f) || i === highlightString) ? (
+          <circle key={`d${i}`} cx={x(i)} cy={y(f)} r={i === highlightString && inBarre(i, f) ? 5 : 7.5} className={`chord-dot ${i === highlightString ? 'hl' : ''}`} />
+        ) : null,
+      )}
     </svg>
   )
 }

@@ -1,5 +1,5 @@
 // Lance chaque fichier *.test.mjs et cumule les échecs. Aucune dépendance.
-const files = ['./chords.test.mjs', './leitner.test.mjs', './degrees.test.mjs']
+const files = ['./chords.test.mjs', './leitner.test.mjs', './degrees.test.mjs', './roles.test.mjs']
 let total = 0
 for (const f of files) {
   const { failures } = await import(f)
