@@ -1,9 +1,11 @@
 {
   "chordStats": {},
   "pianoChordStats": {},
+  "guitarBuildStats": {},
   "pianoBuildStats": {},
   "guitarRoleStats": {},
   "pianoRoleStats": {},
+  "scaleStats": {},
   "degreeToChordStats": {},
   "degreeToSeventhStats": {},
   "chordToDegreeStats": {}

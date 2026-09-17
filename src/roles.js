@@ -9,7 +9,7 @@
 
 import CHORDS from './chords.json' with { type: 'json' }
 import { formatChordName, rootPitchClass } from './lib/chordName.js'
-import { VOICINGS } from './pianoChords.js'
+import { INTERVALS, STANDARD_TUNING } from './lib/tones.js'
 
 export const ROLES = [
   { id: 'root', label: 'Fondamentale' },
@@ -25,7 +25,6 @@ export const ROLE_QUALITIES = ['maj', 'min', 'dim', 'aug', '7', 'maj7', 'm7', 'm
 // Demi-tons depuis la fondamentale -> rôle (valable pour ROLE_QUALITIES).
 const ROLE_OF_INTERVAL = { 0: 'root', 3: 'third', 4: 'third', 6: 'fifth', 7: 'fifth', 8: 'fifth', 9: 'seventh', 10: 'seventh', 11: 'seventh' }
 
-export const STANDARD_TUNING = [4, 9, 2, 7, 11, 4] // E A D G B E
 const STRING_LABELS = ['6e corde', '5e corde', '4e corde', '3e corde', '2e corde', '1re corde']
 
 export const GUITAR_ROLE_CARDS = CHORDS.filter((c) => ROLE_QUALITIES.includes(c.qual)).flatMap((chord) => {
@@ -63,7 +62,7 @@ export function inversionKeys(rootPc, intervals, k) {
 
 export const PIANO_ROLE_CARDS = ROOTS.flatMap(([root, acc]) =>
   PIANO_ROLE_QUALITIES.flatMap((qual) => {
-    const intervals = VOICINGS[qual]
+    const intervals = INTERVALS[qual]
     const rootPc = rootPitchClass(root, acc)
     const name = formatChordName({ root, acc, qual })
     return intervals.map((_, k) => {

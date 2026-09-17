@@ -3,7 +3,8 @@ const P = new URL('../src', import.meta.url).pathname
 const { QUALITIES, formatChordName, isComplete, sameChord, sameChordEnharmonic, rootPitchClass } = await import(`${P}/lib/chordName.js`)
 const { BOX_INTERVALS_DAYS, applyAnswer, applyAnswers, dueChords, isDue, pickChord, deckSummary, emptyStat } = await import(`${P}/lib/leitner.js`)
 const { applyOp, recordAnswers } = await import(`${P}/lib/ops.js`)
-const { PIANO_CHORDS, PIANO_BUILD_CHORDS, VOICINGS, sameNotes } = await import(`${P}/pianoChords.js`)
+const { PIANO_CHORDS, PIANO_BUILD_CHORDS } = await import(`${P}/pianoChords.js`)
+const { INTERVALS, sameNotes, soundsLike, fretsPitchClasses, chordTones } = await import(`${P}/lib/tones.js`)
 
 // --- Noms ---
 eq('A7', formatChordName({ root: 'A', acc: '', qual: '7' }), 'A7')
@@ -20,7 +21,7 @@ eq('enharmonie : qualité stricte', sameChordEnharmonic({ root: 'A', acc: '#', q
 // --- Banque piano ---
 eq('12 × 18 accords', PIANO_CHORDS.length, 12 * QUALITIES.length)
 eq('ids uniques', new Set(PIANO_CHORDS.map((c) => c.id)).size, PIANO_CHORDS.length)
-eq('une formule par qualité', Object.keys(VOICINGS).sort(), [...QUALITIES].sort())
+eq('une formule par qualité', Object.keys(INTERVALS).sort(), [...QUALITIES].sort())
 eq('touches de C7', PIANO_CHORDS.find((c) => c.id === 'C7').keys, [0, 4, 7, 10])
 eq('touches de Bb9 depuis le Do', PIANO_CHORDS.find((c) => c.id === 'Bb9').keys, [10, 14, 17, 20, 24])
 eq('tout tient sur trois octaves', PIANO_CHORDS.every((c) => Math.max(...c.keys) < 36), true)
@@ -33,6 +34,17 @@ eq('mêmes notes : doublure tolérée', sameNotes([0, 4, 7, 12], [0, 4, 7]), tru
 eq('note en trop refusée', sameNotes([0, 4, 7, 10], [0, 4, 7]), false)
 eq('note manquante refusée', sameNotes([0, 4], [0, 4, 7]), false)
 eq('Dm7 construit au 2e renversement', sameNotes([9, 12, 14, 17], PIANO_CHORDS.find((c) => c.id === 'Dm7').keys), true)
+
+// --- Construire l'accord à la guitare ---
+const G = { root: 'G', acc: '', qual: 'maj' }
+eq('notes de G', chordTones(G), [7, 11, 2])
+eq('grille -> classes de hauteur', fretsPitchClasses([3, 2, 0, 0, 0, 3]), [7, 11, 2, 7, 11, 7])
+eq('G ouvert sonne G', soundsLike(fretsPitchClasses([3, 2, 0, 0, 0, 3]), G), true)
+eq('G barré (forme E) sonne G aussi', soundsLike(fretsPitchClasses([3, 5, 5, 4, 3, 3]), G), true)
+eq('G sans la quinte : refusé (triade)', soundsLike(fretsPitchClasses([3, 2, null, null, null, 3]), G), false)
+eq('C7 ouvert sans quinte : accepté (tétrade)', soundsLike(fretsPitchClasses([null, 3, 2, 3, 1, 0]), { root: 'C', acc: '', qual: '7' }), true)
+eq('note étrangère : refusé', soundsLike(fretsPitchClasses([3, 2, 0, 0, 1, 3]), G), false)
+eq('mineur pour majeur : refusé', soundsLike(fretsPitchClasses([0, 2, 2, 0, 0, 0]), { root: 'E', acc: '', qual: 'maj' }), false)
 
 // --- Dû ou pas ---
 const T = Date.parse('2026-09-17T10:00:00Z')

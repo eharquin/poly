@@ -7,15 +7,20 @@ import ChordDiagram from './components/ChordDiagram.jsx'
 import ChordSelector from './components/ChordSelector.jsx'
 import { ChordToDegreePrompt, DegreeToChordPrompt } from './components/DegreePrompt.jsx'
 import DegreeSelector from './components/DegreeSelector.jsx'
-import { PianoBuildPrompt } from './components/BuildPrompt.jsx'
+import { GuitarBuildPrompt, PianoBuildPrompt } from './components/BuildPrompt.jsx'
+import ChordGridSelector from './components/ChordGridSelector.jsx'
 import PianoDiagram from './components/PianoDiagram.jsx'
 import PianoKeySelector from './components/PianoKeySelector.jsx'
 import { GuitarRolePrompt, PianoRolePrompt } from './components/RolePrompt.jsx'
 import RoleSelector from './components/RoleSelector.jsx'
+import { ScalePrompt } from './components/ScalePrompt.jsx'
+import ScaleSelector from './components/ScaleSelector.jsx'
 import { DEGREE_CARDS, DEGREE_SEVENTH_CARDS } from './degrees.js'
 import { EMPTY_SELECTION, formatChordName, isComplete, pitchClassName, sameChord, sameChordEnharmonic } from './lib/chordName.js'
-import { PIANO_BUILD_CHORDS, PIANO_CHORDS, sameNotes } from './pianoChords.js'
+import { BUILDABLE, fretsPitchClasses, sameNotes, soundsLike } from './lib/tones.js'
+import { PIANO_BUILD_CHORDS, PIANO_CHORDS } from './pianoChords.js'
 import { GUITAR_ROLE_CARDS, PIANO_ROLE_CARDS, roleLabel } from './roles.js'
+import { SCALE_CARDS, noteName } from './scales.js'
 
 // Types de réponse : le sélecteur, la sélection vide, quand elle est complète,
 // et comment l'afficher.
@@ -23,6 +28,22 @@ const CHORD_ANSWER = { Selector: ChordSelector, empty: EMPTY_SELECTION, isComple
 const DEGREE_ANSWER = { Selector: DegreeSelector, empty: { roman: null }, isComplete: (s) => Boolean(s.roman), format: (s) => s.roman ?? '' }
 const ROLE_ANSWER = { Selector: RoleSelector, empty: { role: null }, isComplete: (s) => Boolean(s.role), format: (s) => roleLabel(s.role) }
 const sameRole = (sel, card) => sel.role === card.role
+const FRETS_ANSWER = {
+  Selector: ChordGridSelector,
+  empty: { frets: [null, null, null, null, null, null] },
+  isComplete: (s) => s.frets.filter((f) => f !== null).length >= 3,
+  format: (s) => fretsPitchClasses(s.frets).map(pitchClassName).join(' · '),
+}
+// Accords de la banque guitare à construire : un par nom, sans 11 ni 13.
+const GUITAR_BUILD_CHORDS = CHORDS.filter((c) => BUILDABLE(c.qual)).map((c) => ({ ...c, name: formatChordName(c) }))
+// Sept altérations, une par lettre de la gamme (les lettres viennent de la carte).
+const SCALE_ANSWER = {
+  Selector: ScaleSelector,
+  empty: { accs: [null, null, null, null, null, null, null] },
+  isComplete: (s) => s.accs.every((a) => a !== null),
+  format: (s, card) => card.letters.map((l, i) => `${l}${s.accs[i] ?? '?'}`).join(' '),
+}
+const scaleLabel = (c) => `${c.name} : ${c.notes.map(noteName).join(' ')}`
 const KEYS_ANSWER = {
   Selector: PianoKeySelector,
   empty: { keys: [] },
@@ -62,6 +83,21 @@ export const EXERCISES = [
     answer: CHORD_ANSWER,
     matches: sameChordEnharmonic,
     formatCard: formatChordName,
+  },
+  {
+    id: 'guitar-build',
+    label: "Construire l'accord",
+    instrument: 'Guitare',
+    icon: '🎸',
+    hint: 'Le nom d’un accord : place les doigts sur la grille. N’importe quelle position, seules les notes sonnées comptent.',
+    unit: 'accord',
+    cards: GUITAR_BUILD_CHORDS,
+    section: 'guitarBuildStats',
+    Prompt: GuitarBuildPrompt,
+    question: 'Quelle grille ?',
+    answer: FRETS_ANSWER,
+    matches: (sel, card) => soundsLike(fretsPitchClasses(sel.frets), card),
+    formatCard: (c) => c.name,
   },
   {
     id: 'piano-build',
@@ -107,6 +143,21 @@ export const EXERCISES = [
     answer: ROLE_ANSWER,
     matches: sameRole,
     formatCard: (c) => `${c.name} · ${c.inversionLabel} · ${roleLabel(c.role).toLowerCase()}`,
+  },
+  {
+    id: 'scale',
+    label: 'Notes de la gamme',
+    instrument: 'Théorie',
+    icon: '🎼',
+    hint: 'Une gamme majeure ou mineure naturelle : donne ses sept notes avec la bonne graphie (C# majeur a un E# et un B#).',
+    unit: 'gamme',
+    cards: SCALE_CARDS,
+    section: 'scaleStats',
+    Prompt: ScalePrompt,
+    question: 'Quelles notes ?',
+    answer: SCALE_ANSWER,
+    matches: (sel, card) => card.notes.every((n, i) => n.acc === sel.accs[i]),
+    formatCard: scaleLabel,
   },
   {
     id: 'degree-to-chord',

@@ -473,3 +473,40 @@ details.card > summary {
 .center {
   text-align: center;
 }
+
+/* Grille cliquable (construire l'accord) */
+.chord.interactive {
+  width: 240px;
+  touch-action: manipulation;
+}
+.chord-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+.chord-hit:focus-visible {
+  outline: none;
+  fill: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* Gamme : sept colonnes lettre + ♮ # b */
+.scale-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.scale-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+}
+.scale-col .chip {
+  min-width: 0;
+  padding: 0;
+}
+.scale-letter {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-2);
+}

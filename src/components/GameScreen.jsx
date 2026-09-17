@@ -58,7 +58,7 @@ export default function GameScreen({ exercise, data, onCommit, onBack }) {
       setFeedback({ correct: true, name: formatCard(card), attempts, timeMs: answer.timeMs })
     } else {
       setGame((g) => ({ ...g, current: { ...g.current, attempts } }))
-      setFeedback({ correct: false, name: kind.format(selection) })
+      setFeedback({ correct: false, name: kind.format(selection, card) })
     }
   }
 
@@ -148,7 +148,7 @@ export default function GameScreen({ exercise, data, onCommit, onBack }) {
                   </div>
                 </div>
               )}
-              <kind.Selector value={selection} onChange={setSelection} />
+              <kind.Selector value={selection} onChange={setSelection} card={card} />
             </>
           )}
 

@@ -3,7 +3,7 @@
 // diatonique, avec sa graphie correcte dans la tonalité (le IV de F est Bb,
 // pas A#). Partagée par les exercices « degré → accord » et « accord → degré ».
 
-import { LETTERS, letterPitchClass, rootPitchClass } from './lib/chordName.js'
+import { LETTERS, rootPitchClass, spellOnLetter } from './lib/chordName.js'
 
 // Ordre du cercle des quintes : dièses puis bémols. F# plutôt que Gb (E#dim
 // vaut Cb pour l'exotisme, et F# est plus fréquent à la guitare).
@@ -17,12 +17,6 @@ export const ROMANS = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°']
 const TRIAD_QUALITIES = ['maj', 'min', 'min', 'maj', 'maj', 'min', 'dim']
 const SEVENTH_QUALITIES = ['maj7', 'm7', 'm7', 'maj7', '7', 'm7', 'm7b5']
 
-/** Graphie d'une classe de hauteur sur une lettre imposée : (E, 5) → E#. */
-function spell(letter, pc) {
-  const diff = ((pc - letterPitchClass(letter) + 18) % 12) - 6
-  return { root: letter, acc: diff === 1 ? '#' : diff === -1 ? 'b' : '' }
-}
-
 /**
  * Les 7 degrés d'une tonalité majeure : [{ root, acc, qual, degree, roman,
  * seventh }], en triades ou en tétrades.
@@ -32,7 +26,7 @@ export function majorScaleChords(keyRoot, keyAcc, { seventh = false } = {}) {
   const start = LETTERS.indexOf(keyRoot)
   const qualities = seventh ? SEVENTH_QUALITIES : TRIAD_QUALITIES
   return MAJOR_STEPS.map((step, i) => ({
-    ...spell(LETTERS[(start + i) % 7], (keyPc + step) % 12),
+    ...spellOnLetter(LETTERS[(start + i) % 7], (keyPc + step) % 12),
     qual: qualities[i],
     degree: i + 1,
     roman: ROMANS[i],
