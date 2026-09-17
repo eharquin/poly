@@ -6,12 +6,13 @@ import { applyAnswers } from './leitner.js'
 
 // Sections de data.json portant l'état Leitner d'un exercice, garanties
 // présentes à la lecture (voir github.js).
-export const STAT_SECTIONS = ['chordStats', 'pianoChordStats']
+export const STAT_SECTIONS = ['chordStats', 'pianoChordStats', 'degreeToChordStats', 'chordToDegreeStats']
 
 /**
  * Enregistre les réponses d'une partie dans la section d'un exercice :
- * [{ chordId, attempts, timeMs, at }]. `at` est fixé à la réponse, pas au
- * commit, pour qu'une op rejouée hors-ligne garde sa date.
+ * [{ chordId, attempts, timeMs, at }]. `chordId` est l'id de la carte (le nom
+ * date du premier exercice). `at` est fixé à la réponse, pas au commit, pour
+ * qu'une op rejouée hors-ligne garde sa date.
  */
 export function recordAnswers(section, answers) {
   if (!STAT_SECTIONS.includes(section)) throw new Error(`section inconnue : ${section}`)

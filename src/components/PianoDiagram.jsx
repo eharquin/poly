@@ -20,8 +20,8 @@ const LAYOUT = [
   { white: 6 },
 ]
 
-export default function PianoDiagram({ chord, label }) {
-  const { keys } = chord
+export default function PianoDiagram({ card, label }) {
+  const { keys } = card
   const octaves = Math.max(2, Math.ceil((Math.max(...keys) + 1) / 12))
   const whites = octaves * 7
   const W = whites * WK + PAD * 2

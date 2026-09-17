@@ -13,8 +13,8 @@ const DY = 28 // hauteur d'une case
 const W = X0 * 2 + DX * (STRINGS - 1)
 const H = Y0 + DY * FRETS_SHOWN + 8
 
-export default function ChordDiagram({ chord, label }) {
-  const { frets, barre } = chord
+export default function ChordDiagram({ card, label }) {
+  const { frets, barre } = card
   const x = (string) => X0 + string * DX
   const y = (fret) => Y0 + (fret - 1) * DY + DY / 2
   const inBarre = (string, fret) => barre && fret === barre.fret && string >= barre.from && string <= barre.to

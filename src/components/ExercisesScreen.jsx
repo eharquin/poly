@@ -7,7 +7,7 @@ export default function ExercisesScreen({ data, onOpen }) {
     <div className="screen">
       <h2>Exercices</h2>
       {EXERCISES.map((ex) => {
-        const s = deckSummary(ex.chords, data[ex.section])
+        const s = deckSummary(ex.cards, data[ex.section])
         return (
           <section key={ex.id} className="card">
             <div className="line-head">
@@ -18,7 +18,7 @@ export default function ExercisesScreen({ data, onOpen }) {
             </div>
             <p className="muted small">{ex.hint}</p>
             <p className="muted small">
-              {s.seen}/{s.total} accords vus
+              {s.seen}/{s.total} {ex.unit}s vu{ex.unit === 'carte' ? 'e' : ''}s
             </p>
             <div className="actions">
               <button type="button" className="btn primary" onClick={() => onOpen(ex.id)}>

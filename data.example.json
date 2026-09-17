@@ -1,4 +1,6 @@
 {
   "chordStats": {},
-  "pianoChordStats": {}
+  "pianoChordStats": {},
+  "degreeToChordStats": {},
+  "chordToDegreeStats": {}
 }

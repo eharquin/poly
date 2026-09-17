@@ -434,3 +434,13 @@ details.card > summary {
   stroke: #111418;
   stroke-width: 1;
 }
+
+/* Énoncé textuel (degrés) */
+.text-prompt {
+  text-align: center;
+  font-size: 1.15rem;
+  margin: 18px 0 14px;
+}
+.text-prompt strong {
+  font-size: 1.3rem;
+}

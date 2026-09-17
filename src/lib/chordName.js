@@ -5,6 +5,9 @@
 
 export const NOTES = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
+// Les mêmes, dans l'ordre des gammes (pour parcourir une gamme lettre par lettre).
+export const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+
 // Valeur stockée -> libellé du bouton.
 export const ACCIDENTALS = [
   { value: '', label: '♮' },
@@ -34,6 +37,11 @@ export function sameChord(a, b) {
 
 const NOTE_PC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }
 const ACC_PC = { '': 0, '#': 1, b: -1 }
+
+/** Classe de hauteur d'une note naturelle : E → 4. */
+export function letterPitchClass(letter) {
+  return NOTE_PC[letter]
+}
 
 /** Classe de hauteur (0-11) d'une fondamentale : Bb = A# = 10. */
 export function rootPitchClass(root, acc) {
