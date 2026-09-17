@@ -62,3 +62,30 @@ export function IntervalNotePrompt({ card }) {
     </p>
   )
 }
+
+/** « 4 bémols » — la réponse est la tonalité majeure. */
+export function SignaturePrompt({ card }) {
+  return (
+    <p className="text-prompt">
+      À l'armure : <strong>{card.signature}</strong>. Quelle tonalité majeure ?
+    </p>
+  )
+}
+
+/** « Eb majeur » — la réponse est l'armure. */
+export function KeySignaturePrompt({ card }) {
+  return (
+    <p className="text-prompt">
+      L'armure de <strong>{card.name}</strong> ?
+    </p>
+  )
+}
+
+/** « Le relatif mineur de Eb majeur ? » */
+export function RelativePrompt({ card }) {
+  return (
+    <p className="text-prompt">
+      Le relatif <strong>{card.ask}</strong> de <strong>{card.from}</strong> ?
+    </p>
+  )
+}

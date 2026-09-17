@@ -8,9 +8,11 @@ import DegreeSelector from './DegreeSelector.jsx'
 import { INTERVAL_NAME_CARDS, INTERVAL_NOTE_CARDS, intervalLabel, inversion } from './intervals.js'
 import IntervalSelector from './IntervalSelector.jsx'
 import KeySelector from './KeySelector.jsx'
+import { KEY_TO_SIGNATURE_CARDS, RELATIVE_CARDS, SIGNATURE_TO_KEY_CARDS } from './keys.js'
+import SignatureSelector from './SignatureSelector.jsx'
 import { MODE_NAME_CARDS, MODE_PARENT_CARDS } from './modes.js'
 import ModeSelector from './ModeSelector.jsx'
-import { ChordToDegreePrompt, DegreeToChordPrompt, IntervalNamePrompt, IntervalNotePrompt, ModeNamePrompt, ModeParentPrompt, ScalePrompt } from './prompts.jsx'
+import { ChordToDegreePrompt, DegreeToChordPrompt, IntervalNamePrompt, IntervalNotePrompt, KeySignaturePrompt, ModeNamePrompt, ModeParentPrompt, RelativePrompt, ScalePrompt, SignaturePrompt } from './prompts.jsx'
 import { SCALE_CARDS, noteName, scaleFormula, scaleNotes } from './scales.js'
 import ScaleSelector from './ScaleSelector.jsx'
 
@@ -29,6 +31,18 @@ const KEY_ANSWER = {
   format: (s) => `${s.root}${s.acc} majeur`,
 }
 const NOTE_ANSWER = { ...KEY_ANSWER, format: (s) => `${s.root}${s.acc}` }
+const RELATIVE_ANSWER = { ...KEY_ANSWER, format: (s, card) => `${s.root}${s.acc} ${card.ask}` }
+const SIGNATURE_ANSWER = {
+  Selector: SignatureSelector,
+  empty: { count: null, kind: null },
+  isComplete: (s) => s.count === 0 || (s.count > 0 && Boolean(s.kind)),
+  format: (s) => (s.count === 0 ? 'aucune altération' : `${s.count} ${s.kind === '#' ? 'dièse' : 'bémol'}${s.count > 1 ? 's' : ''}`),
+}
+const explainKey = (k) => [
+  { label: 'Altérations', value: k.accidentals.length ? k.accidentals.join(' ') : '—', mono: true },
+  { label: 'Majeur / mineur', value: `${k.major} majeur = ${k.minor} mineur` },
+  { label: 'Gamme', value: majorScaleChords(k.majorRoot, k.majorAcc).map((x) => `${x.root}${x.acc}`).join(' '), mono: true },
+]
 const INTERVAL_ANSWER = {
   Selector: IntervalSelector,
   empty: { number: null, quality: null },
@@ -82,6 +96,54 @@ export const THEORY = {
   label: instrument,
   icon,
   exercises: [
+    {
+      id: 'signature-to-key',
+      label: 'Armure → tonalité',
+      instrument,
+      icon,
+      hint: 'Un nombre de dièses ou de bémols : quelle tonalité majeure ? Dièses : la tonique est un demi-ton au-dessus du dernier ; bémols : c’est l’avant-dernier.',
+      unit: 'carte',
+      cards: SIGNATURE_TO_KEY_CARDS,
+      section: 'signatureToKeyStats',
+      Prompt: SignaturePrompt,
+      question: 'Quelle tonalité ?',
+      answer: KEY_ANSWER,
+      matches: (sel, card) => sel.root === card.majorRoot && sel.acc === card.majorAcc,
+      formatCard: (k) => `${k.signature} : ${k.major} majeur`,
+      explain: explainKey,
+    },
+    {
+      id: 'key-to-signature',
+      label: 'Tonalité → armure',
+      instrument,
+      icon,
+      hint: 'Une tonalité, majeure ou mineure : combien de dièses ou de bémols ? Le mineur emprunte l’armure de son relatif majeur.',
+      unit: 'carte',
+      cards: KEY_TO_SIGNATURE_CARDS,
+      section: 'keyToSignatureStats',
+      Prompt: KeySignaturePrompt,
+      question: 'Quelle armure ?',
+      answer: SIGNATURE_ANSWER,
+      matches: (sel, card) => sel.count === card.count && (card.count === 0 || sel.kind === card.kind),
+      formatCard: (k) => `${k.name} : ${k.signature}`,
+      explain: explainKey,
+    },
+    {
+      id: 'relative',
+      label: 'Relatif',
+      instrument,
+      icon,
+      hint: 'Le relatif mineur est une tierce mineure sous le majeur (Eb → C), le relatif majeur une tierce mineure au-dessus du mineur (F# → A). Même armure.',
+      unit: 'carte',
+      cards: RELATIVE_CARDS,
+      section: 'relativeStats',
+      Prompt: RelativePrompt,
+      question: 'Quel relatif ?',
+      answer: RELATIVE_ANSWER,
+      matches: (sel, card) => sel.root === card.answerRoot && sel.acc === card.answerAcc,
+      formatCard: (k) => `relatif ${k.ask} de ${k.from} : ${k.answer}`,
+      explain: explainKey,
+    },
     {
       id: 'interval-name',
       label: 'Nommer l’intervalle',
