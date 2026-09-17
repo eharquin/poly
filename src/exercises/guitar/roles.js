@@ -1,7 +1,7 @@
 // « Rôle de la note » à la guitare : une carte par (grille, corde jouée), le
 // nom de l'accord affiché — on apprend quelle note sonne sur quelle corde.
 
-import { formatChordName, rootPitchClass } from '../../lib/chordName.js'
+import { formatChordName, pitchClassName, rootPitchClass } from '../../lib/chordName.js'
 import { QUALITY_TIER, STANDARD_TUNING } from '../../lib/tones.js'
 import { ROLE_OF_INTERVAL, ROLE_QUALITIES } from '../common/roles.js'
 import CHORDS from './chords.json' with { type: 'json' }
@@ -16,6 +16,7 @@ export const GUITAR_ROLE_CARDS = CHORDS.filter((c) => ROLE_QUALITIES.includes(c.
   return chord.frets.flatMap((fret, string) => {
     if (fret === null) return []
     const role = ROLE_OF_INTERVAL[(STANDARD_TUNING[string] + fret - rootPc + 12) % 12]
-    return [{ id: `${chord.id}@${string}`, name, frets: chord.frets, barre: chord.barre, string, stringLabel: STRING_LABELS[string], role, tier }]
+    const note = pitchClassName(STANDARD_TUNING[string] + fret)
+    return [{ id: `${chord.id}@${string}`, name, chord, note, frets: chord.frets, barre: chord.barre, string, stringLabel: STRING_LABELS[string], role, tier }]
   })
 })

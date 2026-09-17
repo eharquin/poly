@@ -50,6 +50,26 @@ export function scaleNotes(root, acc, mode) {
 
 export const noteName = (n) => `${n.root}${n.acc}`
 
+const MAJOR_STEPS = [0, 2, 4, 5, 7, 9, 11]
+
+/** Formule en degrés par rapport au majeur : "1 2 b3 4 5 b6 7". */
+export function scaleFormula(mode) {
+  const { steps, letters } = MODES[mode]
+  return steps
+    .map((s, i) => {
+      const d = letters ? letters[i] : i
+      const diff = s - MAJOR_STEPS[d]
+      return `${diff === -1 ? 'b' : diff === 1 ? '#' : ''}${d + 1}`
+    })
+    .join(' ')
+}
+
+/** Relatif majeur d'une tonique mineure (une tierce mineure au-dessus), épelé. */
+function relativeMajor(root, acc) {
+  const n = spellOnLetter(LETTERS[(LETTERS.indexOf(root) + 2) % 7], (rootPitchClass(root, acc) + 3) % 12)
+  return noteName(n)
+}
+
 // Palier : majeures jusqu'à 3 altérations ; autres majeures et mineures
 // naturelles ; harmoniques, mélodiques et pentatoniques ; modes et blues.
 function scaleTier(mode, notes) {
@@ -64,7 +84,17 @@ const cards = (tonics, mode) =>
   tonics.flatMap(([root, acc, parent]) => {
     const notes = scaleNotes(root, acc, mode)
     if (notes.some((n) => !n || n.acc.length > 1)) return []
-    return [{ id: `${root}${acc}:${mode}`, tonic: `${root}${acc}`, mode, name: `${root}${acc} ${MODES[mode].label}`, parent: parent ?? null, notes, letters: notes.map((n) => n.root), tier: scaleTier(mode, notes) }]
+    return [{
+      id: `${root}${acc}:${mode}`,
+      tonic: `${root}${acc}`,
+      mode,
+      name: `${root}${acc} ${MODES[mode].label}`,
+      parent: parent ?? null,
+      relative: mode === 'maj' ? null : relativeMajor(root, acc),
+      notes,
+      letters: notes.map((n) => n.root),
+      tier: scaleTier(mode, notes),
+    }]
   })
 
 /** Toniques d'un mode : le degré `degree` de chaque tonalité majeure, avec la tonalité mère. */

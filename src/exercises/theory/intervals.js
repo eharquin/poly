@@ -78,7 +78,9 @@ const ALL = FROM_NOTES.flatMap(([from, noteTier]) =>
   INTERVALS.flatMap(([n, quality, intervalTier]) => {
     const to = noteAbove(from, n, quality)
     if (!to) return []
+    const start = LETTERS.indexOf(from.root)
     return [{
+      letters: Array.from({ length: n }, (_, i) => LETTERS[(start + i) % 7]),
       id: `${noteName(from)}:${n}${quality}`,
       from,
       fromName: noteName(from),

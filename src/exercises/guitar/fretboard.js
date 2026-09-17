@@ -13,7 +13,8 @@ export const STRING_LABELS = ['Mi grave (6e)', 'La (5e)', 'Ré (4e)', 'Sol (3e)'
 export const FRETBOARD_NOTE_CARDS = STANDARD_TUNING.flatMap((open, string) =>
   Array.from({ length: FRETS + 1 }, (_, fret) => {
     const pc = (open + fret) % 12
-    return { id: `s${string}f${fret}`, string, fret, pc, name: pitchClassName(pc), stringLabel: STRING_LABELS[string], tier: fretTier(fret) }
+    const others = Array.from({ length: FRETS + 1 }, (_, f) => f).filter((f) => f !== fret && (open + f) % 12 === pc)
+    return { id: `s${string}f${fret}`, string, fret, pc, name: pitchClassName(pc), stringLabel: STRING_LABELS[string], others, tier: fretTier(fret) }
   }),
 )
 

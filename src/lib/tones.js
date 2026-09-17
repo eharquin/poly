@@ -2,7 +2,7 @@
 // nom, à l'octave, au renversement et aux doublures près. Partagé par les
 // banques piano et les exercices « construire l'accord ».
 
-import { rootPitchClass } from './chordName.js'
+import { pitchClassName, rootPitchClass } from './chordName.js'
 
 // Intervalles (demi-tons) depuis la fondamentale, en position fondamentale
 // resserrée : c'est aussi le voicing affiché au piano. Enrichissements (9,
@@ -44,6 +44,13 @@ export const BUILDABLE = (qual) => qual !== '11' && qual !== '13'
 export function chordTones({ root, acc, qual }) {
   const pc = rootPitchClass(root, acc)
   return INTERVALS[qual].map((i) => (pc + i) % 12)
+}
+
+// Rôle de chaque intervalle d'une formule, pour le retour : "E (1) · G# (3) · B (5)".
+const DEGREE_OF_INTERVAL = { 0: '1', 2: '2', 3: 'b3', 4: '3', 5: '4', 6: 'b5', 7: '5', 8: '#5', 9: '6', 10: 'b7', 11: '7', 14: '9', 17: '11', 21: '13' }
+export function chordTonesWithRoles(chord) {
+  const pc = rootPitchClass(chord.root, chord.acc)
+  return INTERVALS[chord.qual].map((i) => `${pitchClassName(pc + i)} (${DEGREE_OF_INTERVAL[i] ?? i})`).join(' · ')
 }
 
 export const STANDARD_TUNING = [4, 9, 2, 7, 11, 4] // E A D G B E, corde grave -> aiguë

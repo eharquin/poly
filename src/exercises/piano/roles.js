@@ -42,6 +42,7 @@ export const PIANO_ROLE_CARDS = ROOTS.flatMap(([root, acc]) =>
       return {
         id: `${root}${acc}${qual}/${k}`,
         name,
+        chord: { root, acc, qual },
         keys,
         highlight: keys[1],
         inversion: k,

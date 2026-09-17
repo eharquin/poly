@@ -4,6 +4,8 @@ import { recordAnswers } from '../lib/ops.js'
 import { clearGameDraft, loadGameDraft, saveGameDraft } from '../lib/storage.js'
 
 const plural = (n, unit) => `${n} ${unit}${n > 1 ? 's' : ''}`
+// Essais ratés avant de proposer la réponse.
+const REVEAL_AFTER = 2
 
 /**
  * Une partie d'un exercice : son énoncé (diagramme ou texte), son sélecteur,
@@ -14,7 +16,7 @@ const plural = (n, unit) => `${n} ${unit}${n > 1 ? 's' : ''}`
  * (propre à l'exercice).
  */
 export default function GameScreen({ exercise, data, onCommit, onBack }) {
-  const { cards, section, Prompt, answer: kind, matches, formatCard, unit } = exercise
+  const { cards, section, Prompt, answer: kind, matches, formatCard, unit, explain } = exercise
   const [game, setGame] = useState(() => {
     const draft = loadGameDraft()
     return draft?.exerciseId === exercise.id ? draft : null
@@ -49,13 +51,17 @@ export default function GameScreen({ exercise, data, onCommit, onBack }) {
     show(null)
   }
 
+  const solve = (attempts, revealed) => {
+    const answer = { chordId: card.id, attempts, timeMs: Date.now() - game.current.shownAt, at: new Date().toISOString(), revealed }
+    setGame((g) => ({ ...g, answers: [...g.answers, answer], current: { ...g.current, attempts } }))
+    setFeedback({ correct: true, revealed, name: formatCard(card), attempts, timeMs: answer.timeMs, facts: explain ? explain(card) : [] })
+  }
+
   const validate = () => {
     if (!card || !kind.isComplete(selection, card)) return
     const attempts = game.current.attempts + 1
     if (matches(selection, card)) {
-      const answer = { chordId: card.id, attempts, timeMs: Date.now() - game.current.shownAt, at: new Date().toISOString() }
-      setGame((g) => ({ ...g, answers: [...g.answers, answer], current: { ...g.current, attempts } }))
-      setFeedback({ correct: true, name: formatCard(card), attempts, timeMs: answer.timeMs })
+      solve(attempts, false)
     } else {
       setGame((g) => ({ ...g, current: { ...g.current, attempts } }))
       setFeedback({ correct: false, name: kind.format(selection, card) })
@@ -134,17 +140,28 @@ export default function GameScreen({ exercise, data, onCommit, onBack }) {
           <Prompt card={card} label={feedback?.correct ? feedback.name : exercise.question} solved={Boolean(feedback?.correct)} />
 
           {feedback?.correct ? (
-            <div className="game-feedback right">
-              <span className="feedback-icon" aria-hidden="true">
-                ✓
-              </span>
-              <div>
-                <strong>{feedback.name}</strong>
-                <div className="muted small">
-                  {feedback.attempts} essai{feedback.attempts > 1 ? 's' : ''} · {(feedback.timeMs / 1000).toFixed(1)} s
+            <>
+              <div className={`game-feedback ${feedback.revealed ? 'wrong' : 'right'}`}>
+                <span className="feedback-icon" aria-hidden="true">
+                  {feedback.revealed ? '👁' : '✓'}
+                </span>
+                <div>
+                  <strong>{feedback.name}</strong>
+                  <div className="muted small">
+                    {feedback.revealed ? `réponse montrée après ${feedback.attempts - 1} essai${feedback.attempts > 2 ? 's' : ''}` : `${feedback.attempts} essai${feedback.attempts > 1 ? 's' : ''} · ${(feedback.timeMs / 1000).toFixed(1)} s`}
+                  </div>
                 </div>
               </div>
-            </div>
+              {feedback.facts.length > 0 && (
+                <ul className="facts">
+                  {feedback.facts.map((f) => (
+                    <li key={f.label}>
+                      <span className="muted">{f.label}</span> <span className={f.mono ? 'mono' : ''}>{f.value}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           ) : (
             <>
               {feedback && (
@@ -167,9 +184,16 @@ export default function GameScreen({ exercise, data, onCommit, onBack }) {
                 Suivant
               </button>
             ) : (
-              <button type="button" className="btn primary" onClick={validate} disabled={!kind.isComplete(selection, card)}>
-                Valider
-              </button>
+              <>
+                {game.current.attempts >= REVEAL_AFTER && (
+                  <button type="button" className="btn secondary" onClick={() => solve(game.current.attempts + 1, true)}>
+                    Voir la réponse
+                  </button>
+                )}
+                <button type="button" className="btn primary" onClick={validate} disabled={!kind.isComplete(selection, card)}>
+                  Valider
+                </button>
+              </>
             )}
           </div>
         </section>

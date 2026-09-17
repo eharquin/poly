@@ -65,6 +65,9 @@ const second = applyAnswer(first, { attempts: 3, timeMs: 5000, at: '2026-09-18T1
 eq('trois essais → boîte 1, essais cumulés', [second.box, second.attempts, second.successes], [1, 4, 2])
 eq('moyenne glissante 0.7/0.3', second.avgTimeMs, 3600)
 eq('plafond boîte 5', applyAnswer(seen(5, 20), { attempts: 1, timeMs: 1000, at: 'x' }).box, 5)
+const shown = applyAnswer(first, { attempts: 3, timeMs: 9000, at: '2026-09-18T10:00:00Z', revealed: true })
+eq('réponse montrée : boîte 1, pas de réussite, temps ignoré', [shown.box, shown.attempts, shown.successes, shown.avgTimeMs], [1, 4, 1, 3000])
+eq('réponse montrée dès le premier essai : pas une réussite', applyAnswer(undefined, { attempts: 1, timeMs: 1000, at: 'x', revealed: true }).box, 1)
 
 // --- Tirage ---
 const chords = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]

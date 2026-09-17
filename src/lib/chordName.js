@@ -17,6 +17,13 @@ export const ACCIDENTALS = [
 
 export const QUALITIES = ['maj', 'min', 'dim', 'aug', 'sus2', 'sus4', '6', '7', 'maj7', 'm7', 'm7b5', 'dim7', '9', 'maj9', 'm9', '11', '13', 'add9']
 
+// Nom en toutes lettres, pour le retour.
+export const QUALITY_NAMES = {
+  maj: 'majeur', min: 'mineur', dim: 'diminué', aug: 'augmenté', sus2: 'suspendu 2', sus4: 'suspendu 4',
+  6: 'sixte', 7: 'septième de dominante', maj7: 'majeur septième', m7: 'mineur septième', m7b5: 'demi-diminué', dim7: 'septième diminuée',
+  9: 'neuvième', maj9: 'majeur neuvième', m9: 'mineur neuvième', 11: 'onzième', 13: 'treizième', add9: 'majeur avec neuvième ajoutée',
+}
+
 // Suffixe affiché : "maj" s'écrit sans rien, "min" s'écrit "m".
 const SUFFIX = { maj: '', min: 'm' }
 

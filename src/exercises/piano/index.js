@@ -1,7 +1,9 @@
 // Exercices piano : clavier.
 
-import { formatChordName, pitchClassName, sameChordEnharmonic } from '../../lib/chordName.js'
-import { sameNotes } from '../../lib/tones.js'
+import { QUALITY_NAMES, formatChordName, pitchClassName, sameChordEnharmonic } from '../../lib/chordName.js'
+import { chordTonesWithRoles, sameNotes } from '../../lib/tones.js'
+
+const explainChord = (c) => [{ label: 'Notes', value: chordTonesWithRoles(c), mono: true }, { label: 'Qualité', value: QUALITY_NAMES[c.qual] }]
 import { CHORD_ANSWER, ROLE_ANSWER, sameRole } from '../common/answers.js'
 import { roleLabel } from '../common/roles.js'
 import { PIANO_BUILD_CHORDS, PIANO_CHORDS } from './chords.js'
@@ -39,6 +41,7 @@ export const PIANO = {
       answer: CHORD_ANSWER,
       matches: sameChordEnharmonic,
       formatCard: formatChordName,
+      explain: explainChord,
     },
     {
       id: 'piano-build',
@@ -54,6 +57,7 @@ export const PIANO = {
       answer: KEYS_ANSWER,
       matches: (sel, card) => sameNotes(sel.keys, card.keys),
       formatCard: (c) => c.name,
+      explain: explainChord,
     },
     {
       id: 'piano-role',
@@ -69,6 +73,10 @@ export const PIANO = {
       answer: ROLE_ANSWER,
       matches: sameRole,
       formatCard: (c) => `${c.name} · ${c.inversionLabel} · ${roleLabel(c.role).toLowerCase()}`,
+      explain: (c) => [
+        { label: 'Notes', value: chordTonesWithRoles(c.chord), mono: true },
+        { label: 'À la basse', value: `${pitchClassName(c.keys[0])} — ${c.inversionLabel}` },
+      ],
     },
   ],
 }

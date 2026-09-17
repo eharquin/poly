@@ -1,7 +1,16 @@
 // Exercices guitare : grilles d'accords et manche.
 
-import { NOTE_NAMES_BOTH, formatChordName, pitchClassName, sameChord } from '../../lib/chordName.js'
-import { BUILDABLE, QUALITY_TIER, fretsPitchClasses, soundsLike } from '../../lib/tones.js'
+import { NOTE_NAMES_BOTH, QUALITY_NAMES, formatChordName, pitchClassName, rootPitchClass, sameChord } from '../../lib/chordName.js'
+import { BUILDABLE, QUALITY_TIER, STANDARD_TUNING, chordTonesWithRoles, fretsPitchClasses, soundsLike } from '../../lib/tones.js'
+import { STRING_LABELS } from './fretboard.js'
+
+// Corde la plus grave qui sonne la fondamentale.
+const rootString = (c) => c.frets.findIndex((f, s) => f !== null && (STANDARD_TUNING[s] + f) % 12 === rootPitchClass(c.root, c.acc))
+const explainChord = (c) => [
+  { label: 'Notes', value: chordTonesWithRoles(c), mono: true },
+  { label: 'Qualité', value: QUALITY_NAMES[c.qual] },
+  { label: 'Fondamentale', value: STRING_LABELS[rootString(c)] },
+]
 import { CHORD_ANSWER, ROLE_ANSWER, sameRole } from '../common/answers.js'
 import { roleLabel } from '../common/roles.js'
 import ChordDiagram from './ChordDiagram.jsx'
@@ -50,6 +59,7 @@ export const GUITAR = {
       answer: CHORD_ANSWER,
       matches: sameChord,
       formatCard: formatChordName,
+      explain: explainChord,
     },
     {
       id: 'guitar-build',
@@ -65,6 +75,7 @@ export const GUITAR = {
       answer: FRETS_ANSWER,
       matches: (sel, card) => soundsLike(fretsPitchClasses(sel.frets), card),
       formatCard: (c) => c.name,
+      explain: (c) => [{ label: 'Notes', value: chordTonesWithRoles(c), mono: true }, { label: 'Qualité', value: QUALITY_NAMES[c.qual] }],
     },
     {
       id: 'guitar-role',
@@ -80,6 +91,7 @@ export const GUITAR = {
       answer: ROLE_ANSWER,
       matches: sameRole,
       formatCard: (c) => `${c.name} · ${c.stringLabel} · ${roleLabel(c.role).toLowerCase()}`,
+      explain: (c) => [{ label: 'Notes', value: chordTonesWithRoles(c.chord), mono: true }, { label: 'Cette corde', value: `${c.note}, ${roleLabel(c.role).toLowerCase()} de ${c.name}` }],
     },
     {
       id: 'fretboard-note',
@@ -95,6 +107,10 @@ export const GUITAR = {
       answer: NOTE_ANSWER,
       matches: (sel, card) => sel.pc === card.pc,
       formatCard: (c) => `${c.stringLabel} · ${fretLabel(c.fret)} : ${c.name}`,
+      explain: (c) => [
+        { label: 'Corde à vide', value: pitchClassName(STANDARD_TUNING[c.string]) },
+        { label: 'Même note', value: c.others.length ? c.others.map(fretLabel).join(', ') : 'nulle part ailleurs sur cette corde' },
+      ],
     },
     {
       id: 'fretboard-find',
@@ -110,6 +126,7 @@ export const GUITAR = {
       answer: FRET_ANSWER,
       matches: (sel, card) => card.frets.includes(sel.fret),
       formatCard: (c) => `${c.name} sur ${c.stringLabel} : ${c.frets.map(fretLabel).join(' / ')}`,
+      explain: (c) => [{ label: 'Corde à vide', value: pitchClassName(STANDARD_TUNING[c.string]) }, { label: 'Demi-tons', value: `${c.frets[0]} depuis la corde à vide` }],
     },
   ],
 }

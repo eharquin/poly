@@ -98,15 +98,17 @@ export function pickChord(chords, stats, { now = Date.now(), exclude = null, rng
  * Nouvel état après une question résolue. `attempts` = nombre de clics sur
  * Valider avant la bonne réponse, `timeMs` = chrono jusqu'à celle-ci.
  * Du premier coup → boîte suivante (plafonnée) ; sinon → boîte 1.
+ * `revealed` : la réponse a été montrée — ni réussite, ni temps mesuré.
  */
-export function applyAnswer(stat, { attempts, timeMs, at }) {
+export function applyAnswer(stat, { attempts, timeMs, at, revealed = false }) {
   const prev = stat ?? emptyStat()
-  const firstTry = attempts === 1
+  const firstTry = attempts === 1 && !revealed
+  const time = revealed ? null : Math.round(timeMs)
   return {
     box: firstTry ? Math.min(prev.box + 1, BOXES) : 1,
     attempts: prev.attempts + attempts,
-    successes: prev.successes + 1,
-    avgTimeMs: prev.avgTimeMs == null ? Math.round(timeMs) : Math.round(prev.avgTimeMs * (1 - AVG_ALPHA) + timeMs * AVG_ALPHA),
+    successes: prev.successes + (revealed ? 0 : 1),
+    avgTimeMs: time === null ? prev.avgTimeMs : prev.avgTimeMs == null ? time : Math.round(prev.avgTimeMs * (1 - AVG_ALPHA) + time * AVG_ALPHA),
     lastSeen: at,
   }
 }

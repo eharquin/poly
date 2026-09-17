@@ -1,8 +1,9 @@
 // Exercices de théorie : degrés, gammes, modes.
 
-import { formatChordName, sameChord } from '../../lib/chordName.js'
+import { QUALITY_NAMES, formatChordName, sameChord } from '../../lib/chordName.js'
+import { chordTonesWithRoles } from '../../lib/tones.js'
 import { CHORD_ANSWER } from '../common/answers.js'
-import { DEGREE_CARDS, DEGREE_SEVENTH_CARDS } from './degrees.js'
+import { DEGREE_CARDS, DEGREE_SEVENTH_CARDS, keyAccidentals, majorScaleChords } from './degrees.js'
 import DegreeSelector from './DegreeSelector.jsx'
 import { INTERVAL_NAME_CARDS, INTERVAL_NOTE_CARDS, intervalLabel, inversion } from './intervals.js'
 import IntervalSelector from './IntervalSelector.jsx'
@@ -10,7 +11,7 @@ import KeySelector from './KeySelector.jsx'
 import { MODE_NAME_CARDS, MODE_PARENT_CARDS } from './modes.js'
 import ModeSelector from './ModeSelector.jsx'
 import { ChordToDegreePrompt, DegreeToChordPrompt, IntervalNamePrompt, IntervalNotePrompt, ModeNamePrompt, ModeParentPrompt, ScalePrompt } from './prompts.jsx'
-import { SCALE_CARDS, noteName } from './scales.js'
+import { SCALE_CARDS, noteName, scaleFormula, scaleNotes } from './scales.js'
 import ScaleSelector from './ScaleSelector.jsx'
 
 const DEGREE_ANSWER = { Selector: DegreeSelector, empty: { roman: null }, isComplete: (s) => Boolean(s.roman), format: (s) => s.roman ?? '' }
@@ -35,11 +36,39 @@ const INTERVAL_ANSWER = {
   format: (s) => intervalLabel(s.number, s.quality),
 }
 
-// Retour d'un intervalle : demi-tons, lettres comptées, renversement.
-const intervalFacts = (c) => {
+// Retour d'un intervalle : lettres comptées, demi-tons, renversement.
+const explainInterval = (c) => {
   const inv = inversion(c.number, c.quality)
-  return `${c.semitones} ½ tons${inv ? ` · renversement : ${intervalLabel(inv.n, inv.quality)}` : ''}`
+  return [
+    { label: 'Lettres', value: `${c.letters.join(' ')} → ${c.number}`, mono: true },
+    { label: 'Demi-tons', value: `${c.semitones}` },
+    ...(inv ? [{ label: 'Renversement', value: intervalLabel(inv.n, inv.quality) }] : []),
+  ]
 }
+
+const armure = (root, acc) => {
+  const n = keyAccidentals(root, acc)
+  if (!n) return 'aucune altération'
+  const flat = majorScaleChords(root, acc).some((c) => c.acc === 'b')
+  return `${n} ${flat ? 'bémol' : 'dièse'}${n > 1 ? 's' : ''}`
+}
+const keyParts = (key) => [key[0], key.slice(1)]
+const explainDegree = (c) => [
+  { label: 'Gamme', value: majorScaleChords(...keyParts(c.key)).map((x) => `${x.root}${x.acc}`).join(' '), mono: true },
+  { label: 'Accord', value: `${chordTonesWithRoles(c)} — ${QUALITY_NAMES[c.qual]}`, mono: true },
+]
+const explainScale = (c) => [
+  { label: 'Formule', value: scaleFormula(c.mode), mono: true },
+  c.parent
+    ? { label: 'Tonalité mère', value: `${c.parent} majeur : ${scaleNotes(...keyParts(c.parent), 'maj').map(noteName).join(' ')}`, mono: true }
+    : { label: c.mode === 'maj' ? 'Armure' : 'Relatif', value: c.mode === 'maj' ? armure(...keyParts(c.tonic)) : `${c.relative} majeur (${armure(...keyParts(c.relative))})` },
+]
+const explainMode = (c) => [
+  { label: 'Notes', value: scaleNotes(c.root, c.acc, MODE_KEYS[c.mode]).map(noteName).join(' '), mono: true },
+  { label: 'Formule', value: scaleFormula(MODE_KEYS[c.mode]), mono: true },
+  { label: 'Tonalité mère', value: `${c.parent} majeur (${armure(c.parentRoot, c.parentAcc)}), degré ${c.roman}` },
+]
+const MODE_KEYS = { ionien: 'maj', dorien: 'dor', phrygien: 'phr', lydien: 'lyd', mixolydien: 'mix', éolien: 'min', locrien: 'loc' }
 const MODE_ANSWER = { Selector: ModeSelector, empty: { mode: null }, isComplete: (s) => Boolean(s.mode), format: (s) => s.mode }
 
 const degreeLabel = (c) => `${c.key} · ${c.roman} · ${formatChordName(c)}`
@@ -66,7 +95,8 @@ export const THEORY = {
       question: 'Quel intervalle ?',
       answer: INTERVAL_ANSWER,
       matches: (sel, card) => sel.number === card.number && sel.quality === card.quality,
-      formatCard: (c) => `${c.fromName} → ${c.toName} : ${c.label} (${intervalFacts(c)})`,
+      formatCard: (c) => `${c.fromName} → ${c.toName} : ${c.label}`,
+      explain: explainInterval,
     },
     {
       id: 'interval-note',
@@ -81,7 +111,8 @@ export const THEORY = {
       question: 'Quelle note ?',
       answer: NOTE_ANSWER,
       matches: (sel, card) => sel.root === card.to.root && sel.acc === card.to.acc,
-      formatCard: (c) => `${c.label} au-dessus de ${c.fromName} : ${c.toName} (${intervalFacts(c)})`,
+      formatCard: (c) => `${c.label} au-dessus de ${c.fromName} : ${c.toName}`,
+      explain: explainInterval,
     },
     {
       id: 'scale',
@@ -97,6 +128,7 @@ export const THEORY = {
       answer: SCALE_ANSWER,
       matches: (sel, card) => card.notes.every((n, i) => n.acc === sel.accs[i]),
       formatCard: scaleLabel,
+      explain: explainScale,
     },
     {
       id: 'mode-parent',
@@ -112,6 +144,7 @@ export const THEORY = {
       answer: KEY_ANSWER,
       matches: (sel, card) => sel.root === card.parentRoot && sel.acc === card.parentAcc,
       formatCard: (c) => `${c.name} = ${c.parent} majeur (${c.roman})`,
+      explain: explainMode,
     },
     {
       id: 'mode-name',
@@ -127,6 +160,7 @@ export const THEORY = {
       answer: MODE_ANSWER,
       matches: (sel, card) => sel.mode === card.mode,
       formatCard: (c) => `${c.parent} majeur, sur ${c.tonic} : ${c.mode} (${c.roman})`,
+      explain: explainMode,
     },
     {
       id: 'degree-to-chord',
@@ -142,6 +176,7 @@ export const THEORY = {
       answer: CHORD_ANSWER,
       matches: sameChord,
       formatCard: degreeLabel,
+      explain: explainDegree,
     },
     {
       id: 'degree-to-seventh',
@@ -157,6 +192,7 @@ export const THEORY = {
       answer: CHORD_ANSWER,
       matches: sameChord,
       formatCard: degreeLabel,
+      explain: explainDegree,
     },
     {
       id: 'chord-to-degree',
@@ -172,6 +208,7 @@ export const THEORY = {
       answer: DEGREE_ANSWER,
       matches: (sel, card) => sel.roman === card.roman,
       formatCard: degreeLabel,
+      explain: explainDegree,
     },
   ],
 }
