@@ -256,12 +256,18 @@ main {
   font-size: 0.9rem;
 }
 
-/* Ligne d'en-tête d'une carte : libellé à gauche, compteur à droite */
+/* Ligne d'en-tête : titre à gauche, compteur ou lien à droite */
 .line-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 10px;
+}
+.line-head h2 {
+  margin-bottom: 12px;
+}
+.line-head h3 {
+  margin-bottom: 8px;
 }
 
 /* Statuts : toujours accompagnés d'un chiffre ou d'un mot, jamais la couleur seule */
@@ -404,4 +410,27 @@ details.card > summary {
   text-align: left;
   font-weight: 600;
   color: var(--text-2);
+}
+
+/* Piano — clavier */
+.piano {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px auto 6px;
+}
+.piano-white {
+  fill: #f2f4f6;
+  stroke: #6b7480;
+  stroke-width: 1;
+}
+.piano-black {
+  fill: #111418;
+  stroke: #6b7480;
+  stroke-width: 1;
+}
+.piano-dot {
+  fill: var(--data);
+  stroke: #111418;
+  stroke-width: 1;
 }

@@ -1,23 +1,24 @@
 import { useEffect, useState } from 'react'
-import CHORDS from '../chords.json'
-import { EMPTY_SELECTION, formatChordName, isComplete, sameChord } from '../lib/chordName.js'
+import { EMPTY_SELECTION, formatChordName, isComplete } from '../lib/chordName.js'
 import { BOXES, applyAnswers, deckSummary, pickChord, statOf } from '../lib/leitner.js'
-import { recordChordAnswers } from '../lib/ops.js'
+import { recordAnswers } from '../lib/ops.js'
 import { clearGameDraft, loadGameDraft, saveGameDraft } from '../lib/storage.js'
-import ChordDiagram from './ChordDiagram.jsx'
 import ChordSelector from './ChordSelector.jsx'
 
-const byId = Object.fromEntries(CHORDS.map((c) => [c.id, c]))
-
 /**
- * Jeu « nommer l'accord » : une grille, un sélecteur, Valider jusqu'à la
- * bonne réponse. Chaque question résolue s'ajoute aux réponses de la partie,
- * prises en compte par Leitner pour les tirages suivants, et le tout part
- * dans data.json en un seul commit à « Terminer ». La partie en cours survit
- * à un verrouillage d'écran via le brouillon local.
+ * Jeu « nommer l'accord » pour un exercice donné : son diagramme, un
+ * sélecteur, Valider jusqu'à la bonne réponse. Chaque question résolue
+ * s'ajoute aux réponses de la partie, prises en compte par Leitner pour les
+ * tirages suivants, et le tout part dans data.json en un seul commit à
+ * « Terminer ». La partie en cours survit à un verrouillage d'écran via le
+ * brouillon local (propre à l'exercice).
  */
-export default function GameScreen({ data, onCommit }) {
-  const [game, setGame] = useState(loadGameDraft)
+export default function GameScreen({ exercise, data, onCommit, onBack }) {
+  const { chords, section, Diagram, matches } = exercise
+  const [game, setGame] = useState(() => {
+    const draft = loadGameDraft()
+    return draft?.exerciseId === exercise.id ? draft : null
+  })
   const [selection, setSelection] = useState(EMPTY_SELECTION)
   const [feedback, setFeedback] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -30,15 +31,15 @@ export default function GameScreen({ data, onCommit }) {
 
   // Stats effectives = stats commitées + réponses de la partie en cours.
   const answers = game?.answers ?? []
-  const stats = applyAnswers(data.chordStats, answers)
-  const summary = deckSummary(CHORDS, stats)
+  const stats = applyAnswers(data[section], answers)
+  const summary = deckSummary(chords, stats)
 
-  const chord = game?.current ? byId[game.current.chordId] : null
+  const chord = game?.current ? chords.find((c) => c.id === game.current.chordId) : null
   const answered = answers.length
 
   const show = (exclude) => {
-    const next = pickChord(CHORDS, stats, { exclude })
-    setGame((g) => ({ ...(g ?? { answers: [] }), current: { chordId: next.id, shownAt: Date.now(), attempts: 0 } }))
+    const next = pickChord(chords, stats, { exclude })
+    setGame((g) => ({ ...(g ?? { exerciseId: exercise.id, answers: [] }), current: { chordId: next.id, shownAt: Date.now(), attempts: 0 } }))
     setSelection(EMPTY_SELECTION)
     setFeedback(null)
   }
@@ -51,7 +52,7 @@ export default function GameScreen({ data, onCommit }) {
   const validate = () => {
     if (!isComplete(selection) || !chord) return
     const attempts = game.current.attempts + 1
-    if (sameChord(selection, chord)) {
+    if (matches(selection, chord)) {
       const answer = { chordId: chord.id, attempts, timeMs: Date.now() - game.current.shownAt, at: new Date().toISOString() }
       setGame((g) => ({ ...g, answers: [...g.answers, answer], current: { ...g.current, attempts } }))
       setFeedback({ correct: true, name: formatChordName(chord), attempts, timeMs: answer.timeMs })
@@ -70,7 +71,7 @@ export default function GameScreen({ data, onCommit }) {
     setSaving(true)
     setNotice(null)
     try {
-      const { queued } = await onCommit(recordChordAnswers(answers), `Accords : ${answers.length} réponse${answers.length > 1 ? 's' : ''}`)
+      const { queued } = await onCommit(recordAnswers(section, answers), `${exercise.instrument} : ${answers.length} accord${answers.length > 1 ? 's' : ''}`)
       setGame(null)
       setFeedback(null)
       setNotice({ ok: true, msg: `${answers.length} accord${answers.length > 1 ? 's' : ''} enregistré${answers.length > 1 ? 's' : ''}${queued ? ' (hors-ligne, en attente)' : ' ✓'}` })
@@ -83,10 +84,16 @@ export default function GameScreen({ data, onCommit }) {
 
   return (
     <div className="screen">
-      <h2>Accords</h2>
+      <div className="line-head">
+        <h2>
+          {exercise.icon} {exercise.label} · {exercise.instrument}
+        </h2>
+        <button type="button" className="btn-link" onClick={onBack} disabled={Boolean(game)}>
+          ← Exercices
+        </button>
+      </div>
 
       <section className="card">
-        <h3>Nommer l'accord</h3>
         <p className="muted small">
           {summary.seen}/{summary.total} accords vus · {summary.due} à revoir
         </p>
@@ -115,7 +122,7 @@ export default function GameScreen({ data, onCommit }) {
             <span className="muted small mono">essai {game.current.attempts + (feedback?.correct ? 0 : 1)}</span>
           </div>
 
-          <ChordDiagram chord={chord} label={feedback?.correct ? feedback.name : 'Quel accord ?'} />
+          <Diagram chord={chord} label={feedback?.correct ? feedback.name : 'Quel accord ?'} />
 
           {feedback?.correct ? (
             <div className="game-feedback right">
@@ -167,14 +174,14 @@ export default function GameScreen({ data, onCommit }) {
         </div>
       )}
 
-      <ChordStats stats={stats} />
+      <ChordStats chords={chords} stats={stats} />
     </div>
   )
 }
 
 /** Accords vus, les plus difficiles d'abord : boîte, taux de réussite, temps moyen. */
-function ChordStats({ stats }) {
-  const rows = CHORDS.map((c) => ({ chord: c, stat: statOf(stats, c.id) }))
+function ChordStats({ chords, stats }) {
+  const rows = chords.map((c) => ({ chord: c, stat: statOf(stats, c.id) }))
     .filter((r) => r.stat.attempts > 0)
     .map((r) => ({ ...r, rate: r.stat.successes / r.stat.attempts }))
     .sort((a, b) => a.rate - b.rate || a.stat.box - b.stat.box)

@@ -1,9 +1,17 @@
 // Accès au fichier data.json via l'API GitHub REST (Contents API).
 // Le token n'est jamais persisté ailleurs que dans le localStorage.
 
+import { STAT_SECTIONS } from './ops.js'
+
 const API = 'https://api.github.com'
 
-export const EMPTY_DATA = { chordStats: {} }
+const withSections = (data) => {
+  const out = { ...data }
+  for (const s of STAT_SECTIONS) out[s] = out[s] ?? {}
+  return out
+}
+
+export const EMPTY_DATA = withSections({})
 
 function headers(token) {
   return {
@@ -54,11 +62,11 @@ async function handle(res) {
 export async function fetchData(settings) {
   const url = `${contentsUrl(settings)}?ref=${encodeURIComponent(settings.branch)}`
   const res = await fetch(url, { headers: headers(settings.token), cache: 'no-store' })
-  if (res.status === 404) return { data: { ...EMPTY_DATA }, sha: null }
+  if (res.status === 404) return { data: withSections({}), sha: null }
   const json = await handle(res)
   const parsed = JSON.parse(decodeBase64(json.content))
   return {
-    data: { ...parsed, chordStats: parsed.chordStats ?? {} },
+    data: withSections(parsed),
     sha: json.sha,
   }
 }

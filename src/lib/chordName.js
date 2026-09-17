@@ -1,7 +1,7 @@
 // Nom d'accord en notation anglaise : note + altération + qualité. Le
-// sélecteur construit un triplet { root, acc, qual } ; la banque (chords.json)
-// porte le même triplet. Comparaison stricte : pas d'enharmonie ni
-// d'orthographe alternative en v1.
+// sélecteur construit un triplet { root, acc, qual } ; les banques portent le
+// même triplet. Comparaison stricte pour la guitare (la grille implique une
+// graphie), enharmonique pour le piano (une touche noire n'en a pas).
 
 export const NOTES = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
@@ -30,6 +30,19 @@ export function isComplete(sel) {
 
 export function sameChord(a, b) {
   return a.root === b.root && a.acc === b.acc && a.qual === b.qual
+}
+
+const NOTE_PC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }
+const ACC_PC = { '': 0, '#': 1, b: -1 }
+
+/** Classe de hauteur (0-11) d'une fondamentale : Bb = A# = 10. */
+export function rootPitchClass(root, acc) {
+  return (NOTE_PC[root] + ACC_PC[acc] + 12) % 12
+}
+
+/** Même accord à la graphie près : A#m = Bbm. */
+export function sameChordEnharmonic(a, b) {
+  return rootPitchClass(a.root, a.acc) === rootPitchClass(b.root, b.acc) && a.qual === b.qual
 }
 
 export const EMPTY_SELECTION = { root: null, acc: null, qual: null }

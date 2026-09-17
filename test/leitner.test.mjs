@@ -1,8 +1,9 @@
 import { eq, done } from './eq.mjs'
 const P = new URL('../src', import.meta.url).pathname
-const { formatChordName, isComplete, sameChord } = await import(`${P}/lib/chordName.js`)
+const { QUALITIES, formatChordName, isComplete, sameChord, sameChordEnharmonic, rootPitchClass } = await import(`${P}/lib/chordName.js`)
 const { BOX_INTERVALS_DAYS, applyAnswer, applyAnswers, dueChords, isDue, pickChord, deckSummary, emptyStat } = await import(`${P}/lib/leitner.js`)
-const { applyOp, recordChordAnswers } = await import(`${P}/lib/ops.js`)
+const { applyOp, recordAnswers } = await import(`${P}/lib/ops.js`)
+const { PIANO_CHORDS, VOICINGS } = await import(`${P}/pianoChords.js`)
 
 // --- Noms ---
 eq('A7', formatChordName({ root: 'A', acc: '', qual: '7' }), 'A7')
@@ -12,6 +13,17 @@ eq('aperçu partiel', formatChordName({ root: 'C', acc: null, qual: null }), 'C'
 eq('complet avec altération naturelle', isComplete({ root: 'C', acc: '', qual: 'maj' }), true)
 eq('incomplet sans altération', isComplete({ root: 'C', acc: null, qual: 'maj' }), false)
 eq('comparaison stricte (A# ≠ Bb)', sameChord({ root: 'A', acc: '#', qual: 'maj' }, { root: 'B', acc: 'b', qual: 'maj' }), false)
+eq('classes de hauteur', [rootPitchClass('C', ''), rootPitchClass('B', 'b'), rootPitchClass('A', '#'), rootPitchClass('C', 'b')], [0, 10, 10, 11])
+eq('enharmonie (A#m = Bbm)', sameChordEnharmonic({ root: 'A', acc: '#', qual: 'min' }, { root: 'B', acc: 'b', qual: 'min' }), true)
+eq('enharmonie : qualité stricte', sameChordEnharmonic({ root: 'A', acc: '#', qual: 'maj' }, { root: 'B', acc: 'b', qual: 'min' }), false)
+
+// --- Banque piano ---
+eq('12 × 18 accords', PIANO_CHORDS.length, 12 * QUALITIES.length)
+eq('ids uniques', new Set(PIANO_CHORDS.map((c) => c.id)).size, PIANO_CHORDS.length)
+eq('une formule par qualité', Object.keys(VOICINGS).sort(), [...QUALITIES].sort())
+eq('touches de C7', PIANO_CHORDS.find((c) => c.id === 'C7').keys, [0, 4, 7, 10])
+eq('touches de Bb9 depuis le Do', PIANO_CHORDS.find((c) => c.id === 'Bb9').keys, [10, 14, 17, 20, 24])
+eq('tout tient sur trois octaves', PIANO_CHORDS.every((c) => Math.max(...c.keys) < 36), true)
 
 // --- Dû ou pas ---
 const T = Date.parse('2026-09-17T10:00:00Z')
@@ -53,10 +65,14 @@ const answers = [
   { chordId: 'A7', attempts: 2, timeMs: 4000, at: '2026-09-17T10:01:00Z' },
   { chordId: 'Emaj', attempts: 1, timeMs: 1000, at: '2026-09-17T10:02:00Z' },
 ]
-const data = applyOp({ sessions: [], chordStats: {} }, recordChordAnswers(answers))
+const data = applyOp({ chordStats: {} }, recordAnswers('chordStats', answers))
 eq('op : deux réponses sur A7', [data.chordStats.A7.box, data.chordStats.A7.attempts, data.chordStats.A7.successes], [1, 3, 2])
 eq('op : Emaj en boîte 2', data.chordStats.Emaj.box, 2)
 eq('op ≡ applyAnswers', data.chordStats, applyAnswers({}, answers))
-eq('op sans chordStats existant', applyOp({ sessions: [] }, recordChordAnswers(answers.slice(2))).chordStats.Emaj.successes, 1)
+eq('op sans section existante', applyOp({}, recordAnswers('pianoChordStats', answers.slice(2))).pianoChordStats.Emaj.successes, 1)
+eq('op : sections indépendantes', applyOp({ chordStats: { A7: { box: 3 } } }, recordAnswers('pianoChordStats', answers.slice(2))).chordStats, { A7: { box: 3 } })
+let thrown = null
+try { recordAnswers('autre', []) } catch (e) { thrown = e.message }
+eq('section inconnue refusée', thrown, 'section inconnue : autre')
 
 export const failures = done('leitner')

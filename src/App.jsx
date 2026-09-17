@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import ExercisesScreen from './components/ExercisesScreen.jsx'
 import GameScreen from './components/GameScreen.jsx'
 import Nav from './components/Nav.jsx'
 import TokenConfig from './components/TokenConfig.jsx'
+import { getExercise } from './exercises.js'
 import { useData } from './hooks/useData.js'
 import { useSettings } from './hooks/useSettings.js'
-import { isConfigured } from './lib/storage.js'
+import { isConfigured, loadGameDraft } from './lib/storage.js'
 
 /** Jours entre aujourd'hui et une date ISO (négatif si passée), ou null. */
 function daysUntil(iso) {
@@ -19,6 +21,9 @@ export default function App() {
   const [settings, updateSettings] = useSettings()
   const configured = isConfigured(settings)
   const [tab, setTab] = useState(configured ? 'exercises' : 'settings')
+  // Exercice ouvert ; une partie en cours (brouillon) rouvre le sien au lancement.
+  const [exerciseId, setExerciseId] = useState(() => loadGameDraft()?.exerciseId ?? null)
+  const exercise = getExercise(exerciseId)
   const { data, loading, error, lastSync, online, pending, refresh, commit } = useData(settings)
 
   return (
@@ -50,7 +55,11 @@ export default function App() {
       <main>
         {tab === 'exercises' &&
           (configured ? (
-            <GameScreen data={data} onCommit={commit} />
+            exercise ? (
+              <GameScreen key={exercise.id} exercise={exercise} data={data} onCommit={commit} onBack={() => setExerciseId(null)} />
+            ) : (
+              <ExercisesScreen data={data} onOpen={setExerciseId} />
+            )
           ) : (
             <NeedConfig go={() => setTab('settings')} />
           ))}
