@@ -8,7 +8,7 @@ import ChordSelector from './components/ChordSelector.jsx'
 import { ChordToDegreePrompt, DegreeToChordPrompt } from './components/DegreePrompt.jsx'
 import DegreeSelector from './components/DegreeSelector.jsx'
 import PianoDiagram from './components/PianoDiagram.jsx'
-import { DEGREE_CARDS } from './degrees.js'
+import { DEGREE_CARDS, DEGREE_SEVENTH_CARDS } from './degrees.js'
 import { EMPTY_SELECTION, formatChordName, isComplete, sameChord, sameChordEnharmonic } from './lib/chordName.js'
 import { PIANO_CHORDS } from './pianoChords.js'
 
@@ -66,13 +66,28 @@ export const EXERCISES = [
     formatCard: degreeLabel,
   },
   {
+    id: 'degree-to-seventh',
+    label: 'Degré → tétrade',
+    instrument: 'Théorie',
+    icon: '🎼',
+    hint: 'Même chose en accords de septième : Imaj7, ii m7, V7, vii m7b5… La suite logique une fois les triades acquises.',
+    unit: 'carte',
+    cards: DEGREE_SEVENTH_CARDS,
+    section: 'degreeToSeventhStats',
+    Prompt: DegreeToChordPrompt,
+    question: 'Quel accord ?',
+    answer: CHORD_ANSWER,
+    matches: sameChord,
+    formatCard: degreeLabel,
+  },
+  {
     id: 'chord-to-degree',
     label: 'Accord → degré',
     instrument: 'Théorie',
     icon: '🎼',
-    hint: 'Une tonalité majeure et un accord : quel degré ? Comme en lisant la grille d’un morceau.',
+    hint: 'Une tonalité majeure et un accord, triade ou tétrade : quel degré ? Comme en lisant la grille d’un morceau.',
     unit: 'carte',
-    cards: DEGREE_CARDS,
+    cards: [...DEGREE_CARDS, ...DEGREE_SEVENTH_CARDS],
     section: 'chordToDegreeStats',
     Prompt: ChordToDegreePrompt,
     question: 'Quel degré ?',

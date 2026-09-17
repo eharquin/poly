@@ -1,10 +1,10 @@
 import { formatChordName } from '../lib/chordName.js'
 
-/** « En G majeur, l'accord de degré V » — la réponse est l'accord. */
+/** « En G majeur, l'accord (de septième) de degré V » — la réponse est l'accord. */
 export function DegreeToChordPrompt({ card }) {
   return (
     <p className="text-prompt">
-      En <strong>{card.key} majeur</strong>, l'accord de degré <strong className="mono">{card.roman}</strong>
+      En <strong>{card.key} majeur</strong>, l'accord{card.seventh ? ' de septième' : ''} de degré <strong className="mono">{card.roman}</strong>
     </p>
   )
 }
