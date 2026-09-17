@@ -43,7 +43,7 @@ const SCALE_ANSWER = {
   isComplete: (s) => s.accs.every((a) => a !== null),
   format: (s, card) => card.letters.map((l, i) => `${l}${s.accs[i] ?? '?'}`).join(' '),
 }
-const scaleLabel = (c) => `${c.name} : ${c.notes.map(noteName).join(' ')}`
+const scaleLabel = (c) => `${c.name} : ${c.notes.map(noteName).join(' ')}${c.parent ? ` (${c.parent} majeur)` : ''}`
 const KEYS_ANSWER = {
   Selector: PianoKeySelector,
   empty: { keys: [] },
@@ -149,7 +149,7 @@ export const EXERCISES = [
     label: 'Notes de la gamme',
     instrument: 'Théorie',
     icon: '🎼',
-    hint: 'Une gamme majeure, ou mineure naturelle / harmonique / mélodique : donne ses sept notes avec la bonne graphie (C# majeur a un E# et un B#).',
+    hint: 'Majeur, mineur naturel / harmonique / mélodique, ou un mode (dorien, mixolydien…) : donne les sept notes avec la bonne graphie (C# majeur a un E# et un B#).',
     unit: 'gamme',
     cards: SCALE_CARDS,
     section: 'scaleStats',

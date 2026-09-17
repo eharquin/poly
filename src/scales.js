@@ -1,9 +1,12 @@
-// Banque des gammes : majeures, et mineures naturelles / harmoniques /
-// mélodiques (ascendantes), sur les 15 toniques usuelles de chaque (jusqu'à
-// 7 dièses et 7 bémols). Une carte = une gamme, la réponse = ses 7 notes avec
-// leur graphie (C# majeur a un E# et un B#, A mineur harmonique un G#). Les
-// gammes qui demandent une double altération (G# mineur harmonique : F##)
-// sont écartées, le sélecteur n'offre que ♮ / # / b.
+// Banque des gammes : majeures, mineures naturelles / harmoniques /
+// mélodiques (ascendantes), et les cinq autres modes de la gamme majeure
+// (dorien, phrygien, lydien, mixolydien, locrien). Une carte = une gamme, la
+// réponse = ses 7 notes avec leur graphie (C# majeur a un E# et un B#, A
+// mineur harmonique un G#). Majeur et mineur sur les 15 toniques usuelles
+// (jusqu'à 7 dièses et 7 bémols) ; chaque mode sur le degré correspondant de
+// ces 15 tonalités (D dorien = les notes de C majeur). Les gammes qui
+// demandent une double altération (G# mineur harmonique : F##) sont
+// écartées, le sélecteur n'offre que ♮ / # / b.
 
 import { LETTERS, rootPitchClass, spellOnLetter } from './lib/chordName.js'
 
@@ -12,6 +15,12 @@ export const MODES = {
   min: { label: 'mineur naturel', steps: [0, 2, 3, 5, 7, 8, 10] },
   harm: { label: 'mineur harmonique', steps: [0, 2, 3, 5, 7, 8, 11] },
   mel: { label: 'mineur mélodique', steps: [0, 2, 3, 5, 7, 9, 11] },
+  // Modes : `degree` = degré de la gamme majeure dont ils sont la rotation.
+  dor: { label: 'dorien', steps: [0, 2, 3, 5, 7, 9, 10], degree: 2 },
+  phr: { label: 'phrygien', steps: [0, 1, 3, 5, 7, 8, 10], degree: 3 },
+  lyd: { label: 'lydien', steps: [0, 2, 4, 6, 7, 9, 11], degree: 4 },
+  mix: { label: 'mixolydien', steps: [0, 2, 4, 5, 7, 9, 10], degree: 5 },
+  loc: { label: 'locrien', steps: [0, 1, 3, 5, 6, 8, 10], degree: 7 },
 }
 
 // Cercle des quintes, dièses puis bémols.
@@ -34,10 +43,23 @@ export function scaleNotes(root, acc, mode) {
 export const noteName = (n) => `${n.root}${n.acc}`
 
 const cards = (tonics, mode) =>
-  tonics.flatMap(([root, acc]) => {
+  tonics.flatMap(([root, acc, parent]) => {
     const notes = scaleNotes(root, acc, mode)
     if (notes.some((n) => n.acc.length > 1)) return []
-    return [{ id: `${root}${acc}:${mode}`, tonic: `${root}${acc}`, mode, name: `${root}${acc} ${MODES[mode].label}`, notes, letters: notes.map((n) => n.root) }]
+    return [{ id: `${root}${acc}:${mode}`, tonic: `${root}${acc}`, mode, name: `${root}${acc} ${MODES[mode].label}`, parent: parent ?? null, notes, letters: notes.map((n) => n.root) }]
   })
 
-export const SCALE_CARDS = [...cards(MAJOR_TONICS, 'maj'), ...cards(MINOR_TONICS, 'min'), ...cards(MINOR_TONICS, 'harm'), ...cards(MINOR_TONICS, 'mel')]
+/** Toniques d'un mode : le degré `degree` de chaque tonalité majeure, avec la tonalité mère. */
+const modeTonics = (mode) =>
+  MAJOR_TONICS.map(([root, acc]) => {
+    const n = scaleNotes(root, acc, 'maj')[MODES[mode].degree - 1]
+    return [n.root, n.acc, `${root}${acc}`]
+  })
+
+export const SCALE_CARDS = [
+  ...cards(MAJOR_TONICS, 'maj'),
+  ...cards(MINOR_TONICS, 'min'),
+  ...cards(MINOR_TONICS, 'harm'),
+  ...cards(MINOR_TONICS, 'mel'),
+  ...['dor', 'phr', 'lyd', 'mix', 'loc'].flatMap((mode) => cards(modeTonics(mode), mode)),
+]
