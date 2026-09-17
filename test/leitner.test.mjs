@@ -1,7 +1,7 @@
 import { eq, done } from './eq.mjs'
 const P = new URL('../src', import.meta.url).pathname
 const { QUALITIES, formatChordName, isComplete, sameChord, sameChordEnharmonic, rootPitchClass } = await import(`${P}/lib/chordName.js`)
-const { BOX_INTERVALS_DAYS, applyAnswer, applyAnswers, dueChords, isDue, pickChord, deckSummary, emptyStat } = await import(`${P}/lib/leitner.js`)
+const { BOX_INTERVALS_DAYS, applyAnswer, applyAnswers, dueChords, isDue, pickChord, deckSummary, emptyStat, tierProgress, availableCards } = await import(`${P}/lib/leitner.js`)
 const { applyOp, recordAnswers } = await import(`${P}/lib/ops.js`)
 const { PIANO_CHORDS, PIANO_BUILD_CHORDS } = await import(`${P}/exercises/piano/chords.js`)
 const { INTERVALS, sameNotes, soundsLike, fretsPitchClasses, chordTones } = await import(`${P}/lib/tones.js`)
@@ -78,7 +78,23 @@ eq('rien de dû → toute la banque', pickChord(chords, none, { now: T, rng: () 
 const w = { a: seen(1, 0), b: seen(4, 8) }
 eq('poids : premier 80 % → a', pickChord([{ id: 'a' }, { id: 'b' }], w, { now: T, rng: () => 0.79 }).id, 'a')
 eq('poids : au-delà → b', pickChord([{ id: 'a' }, { id: 'b' }], w, { now: T, rng: () => 0.81 }).id, 'b')
-eq('résumé', deckSummary(chords, stats, T), { total: 3, seen: 2, due: 2, byBox: [0, 2, 0, 1, 0, 0] })
+const summary = deckSummary(chords, stats, T)
+eq('résumé', [summary.total, summary.seen, summary.due, summary.byBox], [3, 2, 2, [0, 2, 0, 1, 0, 0]])
+eq('résumé : un seul palier par défaut', summary.tiers, [{ tier: 1, total: 3, seen: 2, acquired: 1, unlocked: true }])
+
+// --- Paliers ---
+const deck = [{ id: 'a1', tier: 1 }, { id: 'a2', tier: 1 }, { id: 'b1', tier: 2 }, { id: 'b2', tier: 2 }, { id: 'c1', tier: 3 }]
+eq('paquet neuf : seul le palier 1 est ouvert', tierProgress(deck, {}).map((t) => t.unlocked), [true, false, false])
+eq('cartes disponibles : palier 1', availableCards(deck, {}).map((c) => c.id), ['a1', 'a2'])
+eq('jamais une carte verrouillée', new Set(Array.from({ length: 50 }, (_, i) => pickChord(deck, {}, { now: T, rng: () => (i % 10) / 10 }).id)), new Set(['a1', 'a2']))
+const half = { a1: seen(2, 0) } // une carte sur deux du palier 1 en boîte 2
+eq('moitié acquise : palier 2 ouvert, pas le 3', tierProgress(deck, half).map((t) => t.unlocked), [true, true, false])
+eq('cartes disponibles : paliers 1 et 2', availableCards(deck, half).map((c) => c.id), ['a1', 'a2', 'b1', 'b2'])
+eq('vue mais pas acquise : ça ne compte pas', tierProgress(deck, { a1: seen(1, 0), a2: seen(1, 0) })[1].unlocked, false)
+const regressed = { a1: seen(2, 0), a2: seen(2, 0), b1: seen(1, 0) }
+eq('carte vue d’un palier refermé : toujours disponible', availableCards(deck, { a1: seen(1, 0), b1: seen(1, 0) }).map((c) => c.id), ['a1', 'a2', 'b1'])
+eq('dus : b1 (boîte 1) et b2 (neuve), pas c1 (verrouillée) ni a1/a2 (revues)', deckSummary(deck, regressed, T).due, 2)
+eq('tout acquis : tout ouvert', tierProgress(deck, { a1: seen(3, 0), a2: seen(3, 0), b1: seen(3, 0), b2: seen(3, 0) }).map((t) => t.unlocked), [true, true, true])
 
 // --- Op ---
 const answers = [

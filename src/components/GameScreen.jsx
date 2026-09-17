@@ -105,6 +105,15 @@ export default function GameScreen({ exercise, data, onCommit, onBack }) {
             </span>
           ))}
         </div>
+        {summary.tiers.length > 1 && (
+          <div className="tiers" aria-label="Paliers">
+            {summary.tiers.map((t) => (
+              <span key={t.tier} className={`tier ${t.unlocked ? '' : 'locked'}`} title={t.unlocked ? `palier ${t.tier} : ${t.acquired} acquis sur ${t.total}` : `palier ${t.tier} : s'ouvre quand la moitié du palier ${t.tier - 1} est acquise`}>
+                {t.unlocked ? `P${t.tier}` : '🔒'} <span className="mono">{t.acquired}/{t.total}</span>
+              </span>
+            ))}
+          </div>
+        )}
         {notice && <div className={`notice ${notice.ok ? 'ok' : 'error'}`}>{notice.msg}</div>}
         {!game && (
           <div className="actions">

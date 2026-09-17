@@ -1,7 +1,12 @@
-// Système de Leitner à 5 boîtes sur les accords. L'état d'apprentissage
-// vit dans data.json sous `chordStats[id]` :
+// Système de Leitner à 5 boîtes sur les cartes d'un exercice. L'état
+// d'apprentissage vit dans data.json, dans la section de l'exercice :
 //   { box, attempts, successes, avgTimeMs, lastSeen }
-// Un accord absent est neuf : boîte 1, aucune stat.
+// Une carte absente est neuve : boîte 1, aucune stat.
+//
+// Paliers : chaque carte porte un `tier` (1 par défaut). Les cartes neuves
+// d'un palier ne sont introduites que lorsque le palier précédent est acquis
+// pour moitié (boîte ≥ 2, donc juste du premier coup au moins une fois).
+// Une carte déjà vue reste tirée normalement, quel que soit son palier.
 
 export const BOXES = 5
 
@@ -30,19 +35,54 @@ export function isDue(stat, now = Date.now()) {
   return Date.parse(stat.lastSeen) + interval * DAY_MS <= now
 }
 
+// Part d'un palier en boîte ≥ 2 à partir de laquelle le suivant s'ouvre.
+export const TIER_UNLOCK_SHARE = 0.5
+
+export const tierOf = (card) => card.tier ?? 1
+
+/**
+ * État des paliers : [{ tier, total, seen, acquired, unlocked }], triés.
+ * Le palier 1 est toujours ouvert ; le suivant s'ouvre quand la moitié du
+ * précédent est acquise.
+ */
+export function tierProgress(cards, stats) {
+  const byTier = new Map()
+  for (const c of cards) {
+    const t = tierOf(c)
+    const entry = byTier.get(t) ?? { tier: t, total: 0, seen: 0, acquired: 0, unlocked: false }
+    const s = statOf(stats, c.id)
+    entry.total++
+    if (s.lastSeen) entry.seen++
+    if (s.box >= 2) entry.acquired++
+    byTier.set(t, entry)
+  }
+  const tiers = [...byTier.values()].sort((a, b) => a.tier - b.tier)
+  tiers.forEach((t, i) => {
+    t.unlocked = i === 0 || tiers[i - 1].acquired / tiers[i - 1].total >= TIER_UNLOCK_SHARE
+  })
+  return tiers
+}
+
+/** Cartes qu'on peut tirer : déjà vues, ou d'un palier ouvert. */
+export function availableCards(cards, stats) {
+  const unlocked = new Set(tierProgress(cards, stats).filter((t) => t.unlocked).map((t) => t.tier))
+  return cards.filter((c) => statOf(stats, c.id).lastSeen || unlocked.has(tierOf(c)))
+}
+
 export function dueChords(chords, stats, now = Date.now()) {
-  return chords.filter((c) => isDue(statOf(stats, c.id), now))
+  return availableCards(chords, stats).filter((c) => isDue(statOf(stats, c.id), now))
 }
 
 /**
- * Tirage pondéré (poids 1/boîte) parmi les accords dus ; si aucun n'est dû,
- * dans toute la banque. `exclude` évite de remontrer l'accord qui vient de
- * passer quand il en reste d'autres. `rng` est injectable pour les tests.
+ * Tirage pondéré (poids 1/boîte) parmi les cartes dues ; si aucune n'est due,
+ * parmi toutes les cartes disponibles (vues, ou d'un palier ouvert).
+ * `exclude` évite de remontrer la carte qui vient de passer quand il en reste
+ * d'autres. `rng` est injectable pour les tests.
  */
 export function pickChord(chords, stats, { now = Date.now(), exclude = null, rng = Math.random } = {}) {
   if (!chords.length) return null
   let pool = dueChords(chords, stats, now)
-  if (!pool.length) pool = chords
+  if (!pool.length) pool = availableCards(chords, stats)
   if (exclude && pool.length > 1) pool = pool.filter((c) => c.id !== exclude)
   const weights = pool.map((c) => 1 / statOf(stats, c.id).box)
   const total = weights.reduce((a, b) => a + b, 0)
@@ -78,16 +118,15 @@ export function applyAnswers(stats, answers) {
   return next
 }
 
-/** Vue d'ensemble pour l'en-tête : répartition par boîte, accords dus. */
+/** Vue d'ensemble pour l'en-tête : répartition par boîte, cartes dues, paliers. */
 export function deckSummary(chords, stats, now = Date.now()) {
   const byBox = Array.from({ length: BOXES + 1 }, () => 0)
   let seen = 0
-  let due = 0
   for (const c of chords) {
     const s = statOf(stats, c.id)
     byBox[s.box]++
     if (s.lastSeen) seen++
-    if (isDue(s, now)) due++
   }
-  return { total: chords.length, seen, due, byBox }
+  const tiers = tierProgress(chords, stats)
+  return { total: chords.length, seen, due: dueChords(chords, stats, now).length, byBox, tiers }
 }

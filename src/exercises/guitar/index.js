@@ -1,7 +1,7 @@
 // Exercices guitare : grilles d'accords et manche.
 
 import { NOTE_NAMES_BOTH, formatChordName, pitchClassName, sameChord } from '../../lib/chordName.js'
-import { BUILDABLE, fretsPitchClasses, soundsLike } from '../../lib/tones.js'
+import { BUILDABLE, QUALITY_TIER, fretsPitchClasses, soundsLike } from '../../lib/tones.js'
 import { CHORD_ANSWER, ROLE_ANSWER, sameRole } from '../common/answers.js'
 import { roleLabel } from '../common/roles.js'
 import ChordDiagram from './ChordDiagram.jsx'
@@ -23,8 +23,10 @@ const NOTE_ANSWER = { Selector: NoteSelector, empty: { pc: null }, isComplete: (
 const FRET_ANSWER = { Selector: FretboardSelector, empty: { fret: null }, isComplete: (s) => s.fret !== null, format: (s) => (s.fret === 0 ? 'à vide' : `case ${s.fret}`) }
 const fretLabel = (f) => (f === 0 ? 'à vide' : `case ${f}`)
 
+// Paliers : nommer = ouverts puis barrés ; construire = par qualité.
+const NAME_CHORDS = CHORDS.map((c) => ({ ...c, tier: c.barre ? 2 : 1 }))
 // Accords de la banque à construire : un par nom, sans 11 ni 13.
-const BUILD_CHORDS = CHORDS.filter((c) => BUILDABLE(c.qual)).map((c) => ({ ...c, name: formatChordName(c) }))
+const BUILD_CHORDS = CHORDS.filter((c) => BUILDABLE(c.qual)).map((c) => ({ ...c, name: formatChordName(c), tier: QUALITY_TIER[c.qual] }))
 
 const instrument = 'Guitare'
 const icon = '🎸'
@@ -41,7 +43,7 @@ export const GUITAR = {
       icon,
       hint: 'Une grille, le nom en notation anglaise. Graphie stricte : la grille implique Bb ou A#.',
       unit: 'accord',
-      cards: CHORDS,
+      cards: NAME_CHORDS,
       section: 'chordStats',
       Prompt: ChordDiagram,
       question: 'Quel accord ?',

@@ -29,6 +29,14 @@ export const INTERVALS = {
   add9: [0, 4, 7, 14],
 }
 
+// Palier d'apprentissage d'une qualité : triades usuelles, puis tétrades et
+// sus, puis le reste.
+export const QUALITY_TIER = {
+  maj: 1, min: 1,
+  7: 2, maj7: 2, m7: 2, dim: 2, sus2: 2, sus4: 2,
+  aug: 3, m7b5: 3, dim7: 3, 6: 3, add9: 3, 9: 3, maj9: 3, m9: 3, 11: 3, 13: 3,
+}
+
 // Qualités dont le voicing omet des notes : on ne les demande pas à construire.
 export const BUILDABLE = (qual) => qual !== '11' && qual !== '13'
 

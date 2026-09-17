@@ -47,6 +47,7 @@ export const PIANO_ROLE_CARDS = ROOTS.flatMap(([root, acc]) =>
         inversion: k,
         inversionLabel: INVERSION_LABELS[k],
         role: ROLE_OF_INTERVAL[intervals[(k + 1) % intervals.length]],
+        tier: intervals.length === 3 ? 1 : 2, // triades, puis tétrades
       }
     })
   }),

@@ -17,6 +17,17 @@ export const ROMANS = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°']
 const TRIAD_QUALITIES = ['maj', 'min', 'min', 'maj', 'maj', 'min', 'dim']
 const SEVENTH_QUALITIES = ['maj7', 'm7', 'm7', 'maj7', '7', 'm7', 'm7b5']
 
+/** Nombre d'altérations à l'armure d'une tonalité majeure. */
+export function keyAccidentals(root, acc) {
+  return majorScaleChords(root, acc).filter((c) => c.acc !== '').length
+}
+
+// Palier d'une tonalité : jusqu'à 2 altérations, jusqu'à 5, au-delà.
+export const keyTier = (root, acc) => {
+  const n = keyAccidentals(root, acc)
+  return n <= 2 ? 1 : n <= 5 ? 2 : 3
+}
+
 /**
  * Les 7 degrés d'une tonalité majeure : [{ root, acc, qual, degree, roman,
  * seventh }], en triades ou en tétrades.
@@ -37,7 +48,8 @@ export function majorScaleChords(keyRoot, keyAcc, { seventh = false } = {}) {
 const cards = (seventh) =>
   MAJOR_KEYS.flatMap(([root, acc]) => {
     const key = `${root}${acc}`
-    return majorScaleChords(root, acc, { seventh }).map((c) => ({ id: `${key}:${c.roman}${seventh ? '7' : ''}`, key, ...c }))
+    const tier = keyTier(root, acc)
+    return majorScaleChords(root, acc, { seventh }).map((c) => ({ id: `${key}:${c.roman}${seventh ? '7' : ''}`, key, tier, ...c }))
   })
 
 export const DEGREE_CARDS = cards(false)

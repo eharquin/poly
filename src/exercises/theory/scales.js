@@ -50,11 +50,21 @@ export function scaleNotes(root, acc, mode) {
 
 export const noteName = (n) => `${n.root}${n.acc}`
 
+// Palier : majeures jusqu'à 3 altérations ; autres majeures et mineures
+// naturelles ; harmoniques, mélodiques et pentatoniques ; modes et blues.
+function scaleTier(mode, notes) {
+  const accidentals = notes.filter((n) => n.acc !== '').length
+  if (mode === 'maj') return accidentals <= 3 ? 1 : 2
+  if (mode === 'min') return 2
+  if (['harm', 'mel', 'pentM', 'pentm'].includes(mode)) return 3
+  return 4
+}
+
 const cards = (tonics, mode) =>
   tonics.flatMap(([root, acc, parent]) => {
     const notes = scaleNotes(root, acc, mode)
     if (notes.some((n) => !n || n.acc.length > 1)) return []
-    return [{ id: `${root}${acc}:${mode}`, tonic: `${root}${acc}`, mode, name: `${root}${acc} ${MODES[mode].label}`, parent: parent ?? null, notes, letters: notes.map((n) => n.root) }]
+    return [{ id: `${root}${acc}:${mode}`, tonic: `${root}${acc}`, mode, name: `${root}${acc} ${MODES[mode].label}`, parent: parent ?? null, notes, letters: notes.map((n) => n.root), tier: scaleTier(mode, notes) }]
   })
 
 /** Toniques d'un mode : le degré `degree` de chaque tonalité majeure, avec la tonalité mère. */

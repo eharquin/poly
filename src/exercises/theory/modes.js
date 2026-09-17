@@ -2,6 +2,7 @@
 // deux sens. Pour chacune des 15 tonalités majeures, le mode de chaque degré
 // (ionien = I … locrien = VII), avec la tonique du mode épelée dans la tonalité.
 
+import { keyTier } from './degrees.js'
 import { scaleNotes } from './scales.js'
 
 export const MODE_NAMES = ['ionien', 'dorien', 'phrygien', 'lydien', 'mixolydien', 'éolien', 'locrien']
@@ -14,8 +15,10 @@ const MAJOR_TONICS = [
 
 const all = MAJOR_TONICS.flatMap(([root, acc]) => {
   const parent = `${root}${acc}`
+  const tier = keyTier(root, acc)
   return scaleNotes(root, acc, 'maj').map((n, i) => ({
     parent,
+    tier,
     parentRoot: root,
     parentAcc: acc,
     degree: i + 1,

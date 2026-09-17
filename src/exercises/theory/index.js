@@ -120,7 +120,7 @@ export const THEORY = {
       icon,
       hint: 'Une tonalité majeure et un accord, triade ou tétrade : quel degré ? Comme en lisant la grille d’un morceau.',
       unit: 'carte',
-      cards: [...DEGREE_CARDS, ...DEGREE_SEVENTH_CARDS],
+      cards: [...DEGREE_CARDS, ...DEGREE_SEVENTH_CARDS.map((c) => ({ ...c, tier: c.tier + 1 }))],
       section: 'chordToDegreeStats',
       Prompt: ChordToDegreePrompt,
       question: 'Quel degré ?',

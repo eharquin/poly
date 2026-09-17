@@ -5,7 +5,7 @@
 // de la fondamentale, pour le clavier SVG.
 
 import { QUALITIES, formatChordName, rootPitchClass } from '../../lib/chordName.js'
-import { BUILDABLE, INTERVALS } from '../../lib/tones.js'
+import { BUILDABLE, INTERVALS, QUALITY_TIER } from '../../lib/tones.js'
 
 // Graphie usuelle des fondamentales : C# et F# en dièses, Eb / Ab / Bb en bémols.
 const ROOTS = [
@@ -16,7 +16,7 @@ const ROOTS = [
 export const PIANO_CHORDS = ROOTS.flatMap(([root, acc]) =>
   QUALITIES.map((qual) => {
     const pc = rootPitchClass(root, acc)
-    return { id: `${root}${acc}${qual}`, root, acc, qual, name: formatChordName({ root, acc, qual }), keys: INTERVALS[qual].map((i) => pc + i) }
+    return { id: `${root}${acc}${qual}`, root, acc, qual, name: formatChordName({ root, acc, qual }), keys: INTERVALS[qual].map((i) => pc + i), tier: QUALITY_TIER[qual] }
   }),
 )
 

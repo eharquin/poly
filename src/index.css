@@ -345,6 +345,26 @@ main {
   text-anchor: middle;
 }
 
+/* Paliers : acquis / total, cadenas tant que le précédent n'est pas à moitié acquis */
+.tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 4px;
+  font-size: 0.8rem;
+}
+.tier {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+}
+.tier.locked {
+  opacity: 0.55;
+  border-style: dashed;
+}
+
 /* Accords — écran de jeu */
 .boxes {
   display: flex;
