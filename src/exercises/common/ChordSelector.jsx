@@ -1,14 +1,16 @@
 import { ACCIDENTALS, NOTES, QUALITIES, formatChordName } from '../../lib/chordName.js'
 
 /** Trois groupes de boutons (note, altération, qualité) et l'aperçu du nom construit. */
-export default function ChordSelector({ value, onChange }) {
+export default function ChordSelector({ value, onChange, hidePreview = false }) {
   const set = (patch) => onChange({ ...value, ...patch })
   const name = formatChordName(value)
   return (
     <div className="chord-selector">
-      <div className="chord-preview mono" aria-live="polite">
-        {name || '…'}
-      </div>
+      {!hidePreview && (
+        <div className="chord-preview mono" aria-live="polite">
+          {name || '…'}
+        </div>
+      )}
       <span className="field-label">Note</span>
       <div className="chips">
         {NOTES.map((n) => (

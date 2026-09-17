@@ -1,6 +1,6 @@
 // Exercices de théorie : degrés, gammes, modes.
 
-import { QUALITY_NAMES, formatChordName, sameChord } from '../../lib/chordName.js'
+import { QUALITY_NAMES, formatChordName, isComplete, sameChord } from '../../lib/chordName.js'
 import { chordTonesWithRoles } from '../../lib/tones.js'
 import { CHORD_ANSWER } from '../common/answers.js'
 import { DEGREE_CARDS, DEGREE_SEVENTH_CARDS, keyAccidentals, majorScaleChords } from './degrees.js'
@@ -12,7 +12,9 @@ import { KEY_TO_SIGNATURE_CARDS, RELATIVE_CARDS, SIGNATURE_TO_KEY_CARDS } from '
 import SignatureSelector from './SignatureSelector.jsx'
 import { MODE_NAME_CARDS, MODE_PARENT_CARDS } from './modes.js'
 import ModeSelector from './ModeSelector.jsx'
-import { ChordToDegreePrompt, DegreeToChordPrompt, IntervalNamePrompt, IntervalNotePrompt, KeySignaturePrompt, ModeNamePrompt, ModeParentPrompt, RelativePrompt, ScalePrompt, SignaturePrompt } from './prompts.jsx'
+import { PROGRESSION_CARDS } from './progressions.js'
+import ProgressionSelector from './ProgressionSelector.jsx'
+import { ChordToDegreePrompt, DegreeToChordPrompt, IntervalNamePrompt, IntervalNotePrompt, KeySignaturePrompt, ModeNamePrompt, ModeParentPrompt, ProgressionPrompt, RelativePrompt, ScalePrompt, SignaturePrompt } from './prompts.jsx'
 import { SCALE_CARDS, noteName, scaleFormula, scaleNotes } from './scales.js'
 import ScaleSelector from './ScaleSelector.jsx'
 
@@ -37,6 +39,12 @@ const SIGNATURE_ANSWER = {
   empty: { count: null, kind: null },
   isComplete: (s) => s.count === 0 || (s.count > 0 && Boolean(s.kind)),
   format: (s) => (s.count === 0 ? 'aucune altération' : `${s.count} ${s.kind === '#' ? 'dièse' : 'bémol'}${s.count > 1 ? 's' : ''}`),
+}
+const PROGRESSION_ANSWER = {
+  Selector: ProgressionSelector,
+  empty: { chords: [], active: 0 },
+  isComplete: (s, card) => card.chords.every((_, i) => s.chords[i] && isComplete(s.chords[i])),
+  format: (s) => s.chords.map((c) => (c && isComplete(c) ? formatChordName(c) : '?')).join(' – '),
 }
 const explainKey = (k) => [
   { label: 'Altérations', value: k.accidentals.length ? k.accidentals.join(' ') : '—', mono: true },
@@ -223,6 +231,25 @@ export const THEORY = {
       matches: (sel, card) => sel.mode === card.mode,
       formatCard: (c) => `${c.parent} majeur, sur ${c.tonic} : ${c.mode} (${c.roman})`,
       explain: explainMode,
+    },
+    {
+      id: 'progression',
+      label: 'Progression → accords',
+      instrument,
+      icon,
+      hint: 'Une progression en degrés (ii – V – I) et une tonalité : les accords, dans l’ordre. Ce qu’on lit sur une grille.',
+      unit: 'carte',
+      cards: PROGRESSION_CARDS,
+      section: 'progressionStats',
+      Prompt: ProgressionPrompt,
+      question: 'Quels accords ?',
+      answer: PROGRESSION_ANSWER,
+      matches: (sel, card) => card.chords.every((c, i) => sel.chords[i] && sameChord(sel.chords[i], c)),
+      formatCard: (c) => `${c.progression} en ${c.key} : ${c.name}`,
+      explain: (c) => [
+        { label: 'Gamme', value: majorScaleChords(...keyParts(c.key)).map((x) => `${x.root}${x.acc}`).join(' '), mono: true },
+        ...c.chords.map((x) => ({ label: x.roman, value: `${x.name} — ${QUALITY_NAMES[x.qual]}`, mono: true })),
+      ],
     },
     {
       id: 'degree-to-chord',

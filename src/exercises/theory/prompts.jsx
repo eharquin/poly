@@ -89,3 +89,14 @@ export function RelativePrompt({ card }) {
     </p>
   )
 }
+
+/** « ii – V – I en F majeur » — la réponse est la suite d'accords. */
+export function ProgressionPrompt({ card }) {
+  return (
+    <p className="text-prompt">
+      <strong className="mono">{card.progression}</strong> en <strong>{card.key} majeur</strong>
+      <br />
+      <span className="muted small">{card.hint}</span>
+    </p>
+  )
+}
