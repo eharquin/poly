@@ -43,10 +43,16 @@ export function letterPitchClass(letter) {
   return NOTE_PC[letter]
 }
 
-/** Graphie d'une classe de hauteur sur une lettre imposée : (E, 5) → E#, (C, 11) → Cb. */
+const ACC_OF_DIFF = { '-2': 'bb', '-1': 'b', 0: '', 1: '#', 2: '##' }
+
+/**
+ * Graphie d'une classe de hauteur sur une lettre imposée : (E, 5) → E#,
+ * (C, 11) → Cb, (F, 7) → F##. Au-delà de deux altérations, null.
+ */
 export function spellOnLetter(letter, pc) {
   const diff = ((pc - NOTE_PC[letter] + 18) % 12) - 6
-  return { root: letter, acc: diff === 1 ? '#' : diff === -1 ? 'b' : '' }
+  const acc = ACC_OF_DIFF[diff]
+  return acc === undefined ? null : { root: letter, acc }
 }
 
 /** Classe de hauteur (0-11) d'une fondamentale : Bb = A# = 10. */

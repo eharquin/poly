@@ -1,12 +1,17 @@
-// Banque des gammes : majeures et mineures naturelles, sur les 15 toniques
-// usuelles de chaque (jusqu'à 7 dièses et 7 bémols). Une carte = une gamme,
-// la réponse = ses 7 notes avec leur graphie (C# majeur a un E# et un B#).
+// Banque des gammes : majeures, et mineures naturelles / harmoniques /
+// mélodiques (ascendantes), sur les 15 toniques usuelles de chaque (jusqu'à
+// 7 dièses et 7 bémols). Une carte = une gamme, la réponse = ses 7 notes avec
+// leur graphie (C# majeur a un E# et un B#, A mineur harmonique un G#). Les
+// gammes qui demandent une double altération (G# mineur harmonique : F##)
+// sont écartées, le sélecteur n'offre que ♮ / # / b.
 
 import { LETTERS, rootPitchClass, spellOnLetter } from './lib/chordName.js'
 
 export const MODES = {
   maj: { label: 'majeur', steps: [0, 2, 4, 5, 7, 9, 11] },
   min: { label: 'mineur naturel', steps: [0, 2, 3, 5, 7, 8, 10] },
+  harm: { label: 'mineur harmonique', steps: [0, 2, 3, 5, 7, 8, 11] },
+  mel: { label: 'mineur mélodique', steps: [0, 2, 3, 5, 7, 9, 11] },
 }
 
 // Cercle des quintes, dièses puis bémols.
@@ -29,9 +34,10 @@ export function scaleNotes(root, acc, mode) {
 export const noteName = (n) => `${n.root}${n.acc}`
 
 const cards = (tonics, mode) =>
-  tonics.map(([root, acc]) => {
+  tonics.flatMap(([root, acc]) => {
     const notes = scaleNotes(root, acc, mode)
-    return { id: `${root}${acc}:${mode}`, tonic: `${root}${acc}`, mode, name: `${root}${acc} ${MODES[mode].label}`, notes, letters: notes.map((n) => n.root) }
+    if (notes.some((n) => n.acc.length > 1)) return []
+    return [{ id: `${root}${acc}:${mode}`, tonic: `${root}${acc}`, mode, name: `${root}${acc} ${MODES[mode].label}`, notes, letters: notes.map((n) => n.root) }]
   })
 
-export const SCALE_CARDS = [...cards(MAJOR_TONICS, 'maj'), ...cards(MINOR_TONICS, 'min')]
+export const SCALE_CARDS = [...cards(MAJOR_TONICS, 'maj'), ...cards(MINOR_TONICS, 'min'), ...cards(MINOR_TONICS, 'harm'), ...cards(MINOR_TONICS, 'mel')]

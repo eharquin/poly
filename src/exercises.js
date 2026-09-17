@@ -149,7 +149,7 @@ export const EXERCISES = [
     label: 'Notes de la gamme',
     instrument: 'Théorie',
     icon: '🎼',
-    hint: 'Une gamme majeure ou mineure naturelle : donne ses sept notes avec la bonne graphie (C# majeur a un E# et un B#).',
+    hint: 'Une gamme majeure, ou mineure naturelle / harmonique / mélodique : donne ses sept notes avec la bonne graphie (C# majeur a un E# et un B#).',
     unit: 'gamme',
     cards: SCALE_CARDS,
     section: 'scaleStats',

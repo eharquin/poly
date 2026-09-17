@@ -13,7 +13,13 @@ eq('F majeur : Bb', names('F', '', 'maj'), 'F G A Bb C D E')
 eq('A mineur naturel', names('A', '', 'min'), 'A B C D E F G')
 eq('A# mineur : sept dièses', names('A', '#', 'min'), 'A# B# C# D# E# F# G#')
 eq('Ab mineur : sept bémols', names('A', 'b', 'min'), 'Ab Bb Cb Db Eb Fb Gb')
-eq('30 gammes, ids uniques', [SCALE_CARDS.length, new Set(SCALE_CARDS.map((c) => c.id)).size], [30, 30])
+eq('A mineur harmonique : G#', names('A', '', 'harm'), 'A B C D E F G#')
+eq('A mineur mélodique : F# et G#', names('A', '', 'mel'), 'A B C D E F# G#')
+eq('Ab mineur harmonique : G naturel (Gb haussé)', names('A', 'b', 'harm'), 'Ab Bb Cb Db Eb Fb G')
+eq('A# mineur mélodique : doubles dièses, bien écrits', names('A', '#', 'mel'), 'A# B# C# D# E# F## G##')
+eq('double altération dans spellOnLetter', [spellOnLetter('F', 7), spellOnLetter('B', 9), spellOnLetter('C', 3)], [{ root: 'F', acc: '##' }, { root: 'B', acc: 'bb' }, null])
+eq('gammes à double altération écartées', SCALE_CARDS.filter((c) => c.mode !== 'maj' && c.mode !== 'min').map((c) => c.tonic).filter((t) => /^[GDA]#$/.test(t)), [])
+eq('15 + 15 + 12 + 12 gammes, ids uniques', [SCALE_CARDS.length, new Set(SCALE_CARDS.map((c) => c.id)).size], [54, 54])
 eq('carte', SCALE_CARDS.find((c) => c.id === 'C#:maj').name, 'C# majeur')
 eq('lettres consécutives depuis la tonique', SCALE_CARDS.find((c) => c.id === 'Eb:min').letters, ['E', 'F', 'G', 'A', 'B', 'C', 'D'])
 
@@ -23,7 +29,7 @@ for (const c of SCALE_CARDS) {
   if (new Set(c.letters).size !== 7) wrong++
   const tonicPc = rootPitchClass(c.notes[0].root, c.notes[0].acc)
   const steps = c.notes.map((n) => (rootPitchClass(n.root, n.acc) - tonicPc + 12) % 12)
-  const want = c.mode === 'maj' ? [0, 2, 4, 5, 7, 9, 11] : [0, 2, 3, 5, 7, 8, 10]
+  const want = { maj: [0, 2, 4, 5, 7, 9, 11], min: [0, 2, 3, 5, 7, 8, 10], harm: [0, 2, 3, 5, 7, 8, 11], mel: [0, 2, 3, 5, 7, 9, 11] }[c.mode]
   if (JSON.stringify(steps) !== JSON.stringify(want)) wrong++
 }
 eq('toutes les gammes justes', wrong, 0)
