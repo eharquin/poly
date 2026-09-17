@@ -50,7 +50,7 @@ export default function GameScreen({ exercise, data, onCommit, onBack }) {
   }
 
   const validate = () => {
-    if (!kind.isComplete(selection) || !card) return
+    if (!card || !kind.isComplete(selection, card)) return
     const attempts = game.current.attempts + 1
     if (matches(selection, card)) {
       const answer = { chordId: card.id, attempts, timeMs: Date.now() - game.current.shownAt, at: new Date().toISOString() }
@@ -158,7 +158,7 @@ export default function GameScreen({ exercise, data, onCommit, onBack }) {
                 Suivant
               </button>
             ) : (
-              <button type="button" className="btn primary" onClick={validate} disabled={!kind.isComplete(selection)}>
+              <button type="button" className="btn primary" onClick={validate} disabled={!kind.isComplete(selection, card)}>
                 Valider
               </button>
             )}

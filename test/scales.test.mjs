@@ -27,7 +27,11 @@ eq('B locrien', names('B', '', 'loc'), 'B C D E F G A')
 eq('Bb mixolydien : notes de Eb majeur', names('B', 'b', 'mix'), 'Bb C D Eb F G Ab')
 eq('un mode porte sa tonalité mère', SCALE_CARDS.find((c) => c.id === 'A:dor').parent, 'G')
 eq('15 toniques par mode, dont C# dorien (B majeur) et Ab dorien (Gb majeur)', [SCALE_CARDS.filter((c) => c.mode === 'dor').length, Boolean(SCALE_CARDS.find((c) => c.id === 'C#:dor')), Boolean(SCALE_CARDS.find((c) => c.id === 'Ab:dor'))], [15, true, true])
-eq('54 + 75 gammes, ids uniques', [SCALE_CARDS.length, new Set(SCALE_CARDS.map((c) => c.id)).size], [129, 129])
+eq('pentatoniques', [names('C', '', 'pentM'), names('A', '', 'pentm'), names('F', '#', 'pentM')], ['C D E G A', 'A C D E G', 'F# G# A# C# D#'])
+eq('blues : la blue note double la lettre', [names('A', '', 'bluesm'), names('C', '', 'bluesM')], ['A C D Eb E G', 'C D Eb E G A'])
+eq('lettres de A blues mineure', SCALE_CARDS.find((c) => c.id === 'A:bluesm').letters, ['A', 'C', 'D', 'E', 'E', 'G'])
+eq('blues à double altération écartées (Cb, Gb majeures ; Ab, Eb mineures)', ['Cb:bluesM', 'Gb:bluesM', 'Ab:bluesm', 'Eb:bluesm'].map((id) => SCALE_CARDS.some((c) => c.id === id)), [false, false, false, false])
+eq('129 + 15 + 15 + 13 + 13 gammes, ids uniques', [SCALE_CARDS.length, new Set(SCALE_CARDS.map((c) => c.id)).size], [185, 185])
 // Un mode = rotation de sa tonalité mère.
 let modeWrong = 0
 for (const c of SCALE_CARDS.filter((c) => c.parent)) {
@@ -39,10 +43,11 @@ eq('modes = rotations de la gamme mère', modeWrong, 0)
 eq('carte', SCALE_CARDS.find((c) => c.id === 'C#:maj').name, 'C# majeur')
 eq('lettres consécutives depuis la tonique', SCALE_CARDS.find((c) => c.id === 'Eb:min').letters, ['E', 'F', 'G', 'A', 'B', 'C', 'D'])
 
-// Chaque gamme a sept lettres distinctes, jamais de double altération, et sonne bien ses degrés.
+// Chaque gamme heptatonique a sept lettres distinctes ; toutes sonnent bien leurs degrés.
 let wrong = 0
 for (const c of SCALE_CARDS) {
-  if (new Set(c.letters).size !== 7) wrong++
+  if (c.notes.length === 7 && new Set(c.letters).size !== 7) wrong++
+  if (c.notes.some((n) => n.acc.length > 1)) wrong++
   const tonicPc = rootPitchClass(c.notes[0].root, c.notes[0].acc)
   const steps = c.notes.map((n) => (rootPitchClass(n.root, n.acc) - tonicPc + 12) % 12)
   const want = MODES[c.mode].steps

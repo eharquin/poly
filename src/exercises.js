@@ -36,11 +36,11 @@ const FRETS_ANSWER = {
 }
 // Accords de la banque guitare à construire : un par nom, sans 11 ni 13.
 const GUITAR_BUILD_CHORDS = CHORDS.filter((c) => BUILDABLE(c.qual)).map((c) => ({ ...c, name: formatChordName(c) }))
-// Sept altérations, une par lettre de la gamme (les lettres viennent de la carte).
+// Une altération par lettre de la gamme (les lettres viennent de la carte).
 const SCALE_ANSWER = {
   Selector: ScaleSelector,
-  empty: { accs: [null, null, null, null, null, null, null] },
-  isComplete: (s) => s.accs.every((a) => a !== null),
+  empty: { accs: [] },
+  isComplete: (s, card) => card.letters.every((_, i) => s.accs[i] != null),
   format: (s, card) => card.letters.map((l, i) => `${l}${s.accs[i] ?? '?'}`).join(' '),
 }
 const scaleLabel = (c) => `${c.name} : ${c.notes.map(noteName).join(' ')}${c.parent ? ` (${c.parent} majeur)` : ''}`
@@ -149,7 +149,7 @@ export const EXERCISES = [
     label: 'Notes de la gamme',
     instrument: 'Théorie',
     icon: '🎼',
-    hint: 'Majeur, mineur naturel / harmonique / mélodique, ou un mode (dorien, mixolydien…) : donne les sept notes avec la bonne graphie (C# majeur a un E# et un B#).',
+    hint: 'Majeur, mineur (naturel, harmonique, mélodique), modes, pentatoniques, blues : donne les notes avec la bonne graphie (C# majeur a un E# et un B#).',
     unit: 'gamme',
     cards: SCALE_CARDS,
     section: 'scaleStats',
