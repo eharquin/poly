@@ -8,6 +8,8 @@
   "guitarRoleStats": {},
   "pianoRoleStats": {},
   "scaleStats": {},
+  "modeParentStats": {},
+  "modeNameStats": {},
   "degreeToChordStats": {},
   "degreeToSeventhStats": {},
   "chordToDegreeStats": {}

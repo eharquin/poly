@@ -9,6 +9,9 @@ import { ChordToDegreePrompt, DegreeToChordPrompt } from './components/DegreePro
 import DegreeSelector from './components/DegreeSelector.jsx'
 import { FretboardFindPrompt, FretboardNotePrompt } from './components/FretboardPrompt.jsx'
 import FretboardSelector from './components/FretboardSelector.jsx'
+import KeySelector from './components/KeySelector.jsx'
+import { ModeNamePrompt, ModeParentPrompt } from './components/ModePrompt.jsx'
+import ModeSelector from './components/ModeSelector.jsx'
 import NoteSelector from './components/NoteSelector.jsx'
 import { GuitarBuildPrompt, PianoBuildPrompt } from './components/BuildPrompt.jsx'
 import ChordGridSelector from './components/ChordGridSelector.jsx'
@@ -23,6 +26,7 @@ import { FRETBOARD_FIND_CARDS, FRETBOARD_NOTE_CARDS } from './fretboard.js'
 import { EMPTY_SELECTION, NOTE_NAMES_BOTH, formatChordName, isComplete, pitchClassName, sameChord, sameChordEnharmonic } from './lib/chordName.js'
 import { BUILDABLE, fretsPitchClasses, sameNotes, soundsLike } from './lib/tones.js'
 import { PIANO_BUILD_CHORDS, PIANO_CHORDS } from './pianoChords.js'
+import { MODE_NAME_CARDS, MODE_PARENT_CARDS } from './modes.js'
 import { GUITAR_ROLE_CARDS, PIANO_ROLE_CARDS, roleLabel } from './roles.js'
 import { SCALE_CARDS, noteName } from './scales.js'
 
@@ -51,6 +55,13 @@ const scaleLabel = (c) => `${c.name} : ${c.notes.map(noteName).join(' ')}${c.par
 const NOTE_ANSWER = { Selector: NoteSelector, empty: { pc: null }, isComplete: (s) => s.pc !== null, format: (s) => NOTE_NAMES_BOTH[s.pc] }
 const FRET_ANSWER = { Selector: FretboardSelector, empty: { fret: null }, isComplete: (s) => s.fret !== null, format: (s) => (s.fret === 0 ? 'à vide' : `case ${s.fret}`) }
 const fretLabel = (f) => (f === 0 ? 'à vide' : `case ${f}`)
+const KEY_ANSWER = {
+  Selector: KeySelector,
+  empty: { root: null, acc: null },
+  isComplete: (s) => Boolean(s.root) && typeof s.acc === 'string',
+  format: (s) => `${s.root}${s.acc} majeur`,
+}
+const MODE_ANSWER = { Selector: ModeSelector, empty: { mode: null }, isComplete: (s) => Boolean(s.mode), format: (s) => s.mode }
 const KEYS_ANSWER = {
   Selector: PianoKeySelector,
   empty: { keys: [] },
@@ -195,6 +206,36 @@ export const EXERCISES = [
     answer: SCALE_ANSWER,
     matches: (sel, card) => card.notes.every((n, i) => n.acc === sel.accs[i]),
     formatCard: scaleLabel,
+  },
+  {
+    id: 'mode-parent',
+    label: 'Mode → tonalité mère',
+    instrument: 'Théorie',
+    icon: '🎼',
+    hint: 'Un mode (E lydien) : de quelle gamme majeure vient-il ? Le lydien est le IVe degré, donc B majeur.',
+    unit: 'carte',
+    cards: MODE_PARENT_CARDS,
+    section: 'modeParentStats',
+    Prompt: ModeParentPrompt,
+    question: 'Quelle tonalité ?',
+    answer: KEY_ANSWER,
+    matches: (sel, card) => sel.root === card.parentRoot && sel.acc === card.parentAcc,
+    formatCard: (c) => `${c.name} = ${c.parent} majeur (${c.roman})`,
+  },
+  {
+    id: 'mode-name',
+    label: 'Degré → mode',
+    instrument: 'Théorie',
+    icon: '🎼',
+    hint: 'Une tonalité majeure et une de ses notes : quel mode commence là ? Il faut d’abord trouver le degré (E est le IV de B → lydien).',
+    unit: 'carte',
+    cards: MODE_NAME_CARDS,
+    section: 'modeNameStats',
+    Prompt: ModeNamePrompt,
+    question: 'Quel mode ?',
+    answer: MODE_ANSWER,
+    matches: (sel, card) => sel.mode === card.mode,
+    formatCard: (c) => `${c.parent} majeur, sur ${c.tonic} : ${c.mode} (${c.roman})`,
   },
   {
     id: 'degree-to-chord',
