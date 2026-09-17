@@ -4,7 +4,7 @@
 // donc pas de liste à la main. `keys` = demi-tons depuis le Do de l'octave
 // de la fondamentale, pour le clavier SVG.
 
-import { QUALITIES, rootPitchClass } from './lib/chordName.js'
+import { QUALITIES, formatChordName, rootPitchClass } from './lib/chordName.js'
 
 // Graphie usuelle des fondamentales : C# et F# en dièses, Eb / Ab / Bb en bémols.
 const ROOTS = [
@@ -38,6 +38,17 @@ export const VOICINGS = {
 export const PIANO_CHORDS = ROOTS.flatMap(([root, acc]) =>
   QUALITIES.map((qual) => {
     const pc = rootPitchClass(root, acc)
-    return { id: `${root}${acc}${qual}`, root, acc, qual, keys: VOICINGS[qual].map((i) => pc + i) }
+    return { id: `${root}${acc}${qual}`, root, acc, qual, name: formatChordName({ root, acc, qual }), keys: VOICINGS[qual].map((i) => pc + i) }
   }),
 )
+
+// Pour « construire l'accord » : pas les 11 et 13, dont le voicing omet des
+// notes (tierce, quinte) qu'on ne peut pas reprocher au joueur d'ajouter.
+export const PIANO_BUILD_CHORDS = PIANO_CHORDS.filter((c) => c.qual !== '11' && c.qual !== '13')
+
+/** Mêmes classes de hauteur, à l'octave, au renversement et aux doublures près. */
+export function sameNotes(keysA, keysB) {
+  const a = new Set(keysA.map((k) => k % 12))
+  const b = new Set(keysB.map((k) => k % 12))
+  return a.size === b.size && [...a].every((pc) => b.has(pc))
+}

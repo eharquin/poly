@@ -122,7 +122,7 @@ export default function GameScreen({ exercise, data, onCommit, onBack }) {
             <span className="muted small mono">essai {game.current.attempts + (feedback?.correct ? 0 : 1)}</span>
           </div>
 
-          <Prompt card={card} label={feedback?.correct ? feedback.name : exercise.question} />
+          <Prompt card={card} label={feedback?.correct ? feedback.name : exercise.question} solved={Boolean(feedback?.correct)} />
 
           {feedback?.correct ? (
             <div className="game-feedback right">

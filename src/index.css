@@ -456,3 +456,20 @@ details.card > summary {
   fill: var(--status-warning);
   font-weight: 700;
 }
+
+/* Clavier cliquable (construire l'accord) */
+.piano.interactive {
+  width: 100%;
+  touch-action: manipulation;
+}
+.piano.interactive rect {
+  cursor: pointer;
+}
+.piano.interactive rect:focus-visible {
+  outline: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.center {
+  text-align: center;
+}

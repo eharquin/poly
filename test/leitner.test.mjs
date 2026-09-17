@@ -3,7 +3,7 @@ const P = new URL('../src', import.meta.url).pathname
 const { QUALITIES, formatChordName, isComplete, sameChord, sameChordEnharmonic, rootPitchClass } = await import(`${P}/lib/chordName.js`)
 const { BOX_INTERVALS_DAYS, applyAnswer, applyAnswers, dueChords, isDue, pickChord, deckSummary, emptyStat } = await import(`${P}/lib/leitner.js`)
 const { applyOp, recordAnswers } = await import(`${P}/lib/ops.js`)
-const { PIANO_CHORDS, VOICINGS } = await import(`${P}/pianoChords.js`)
+const { PIANO_CHORDS, PIANO_BUILD_CHORDS, VOICINGS, sameNotes } = await import(`${P}/pianoChords.js`)
 
 // --- Noms ---
 eq('A7', formatChordName({ root: 'A', acc: '', qual: '7' }), 'A7')
@@ -24,6 +24,15 @@ eq('une formule par qualité', Object.keys(VOICINGS).sort(), [...QUALITIES].sort
 eq('touches de C7', PIANO_CHORDS.find((c) => c.id === 'C7').keys, [0, 4, 7, 10])
 eq('touches de Bb9 depuis le Do', PIANO_CHORDS.find((c) => c.id === 'Bb9').keys, [10, 14, 17, 20, 24])
 eq('tout tient sur trois octaves', PIANO_CHORDS.every((c) => Math.max(...c.keys) < 36), true)
+eq('nom porté par la carte', PIANO_CHORDS.find((c) => c.id === 'Bbm7').name, 'Bbm7')
+
+// --- Construire l'accord ---
+eq('sans 11 ni 13', [PIANO_BUILD_CHORDS.length, PIANO_BUILD_CHORDS.some((c) => c.qual === '11' || c.qual === '13')], [192, false])
+eq('mêmes notes : renversement et octave', sameNotes([4, 7, 12], [0, 4, 7]), true)
+eq('mêmes notes : doublure tolérée', sameNotes([0, 4, 7, 12], [0, 4, 7]), true)
+eq('note en trop refusée', sameNotes([0, 4, 7, 10], [0, 4, 7]), false)
+eq('note manquante refusée', sameNotes([0, 4], [0, 4, 7]), false)
+eq('Dm7 construit au 2e renversement', sameNotes([9, 12, 14, 17], PIANO_CHORDS.find((c) => c.id === 'Dm7').keys), true)
 
 // --- Dû ou pas ---
 const T = Date.parse('2026-09-17T10:00:00Z')

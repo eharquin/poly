@@ -7,12 +7,14 @@ import ChordDiagram from './components/ChordDiagram.jsx'
 import ChordSelector from './components/ChordSelector.jsx'
 import { ChordToDegreePrompt, DegreeToChordPrompt } from './components/DegreePrompt.jsx'
 import DegreeSelector from './components/DegreeSelector.jsx'
+import { PianoBuildPrompt } from './components/BuildPrompt.jsx'
 import PianoDiagram from './components/PianoDiagram.jsx'
+import PianoKeySelector from './components/PianoKeySelector.jsx'
 import { GuitarRolePrompt, PianoRolePrompt } from './components/RolePrompt.jsx'
 import RoleSelector from './components/RoleSelector.jsx'
 import { DEGREE_CARDS, DEGREE_SEVENTH_CARDS } from './degrees.js'
-import { EMPTY_SELECTION, formatChordName, isComplete, sameChord, sameChordEnharmonic } from './lib/chordName.js'
-import { PIANO_CHORDS } from './pianoChords.js'
+import { EMPTY_SELECTION, formatChordName, isComplete, pitchClassName, sameChord, sameChordEnharmonic } from './lib/chordName.js'
+import { PIANO_BUILD_CHORDS, PIANO_CHORDS, sameNotes } from './pianoChords.js'
 import { GUITAR_ROLE_CARDS, PIANO_ROLE_CARDS, roleLabel } from './roles.js'
 
 // Types de réponse : le sélecteur, la sélection vide, quand elle est complète,
@@ -21,6 +23,12 @@ const CHORD_ANSWER = { Selector: ChordSelector, empty: EMPTY_SELECTION, isComple
 const DEGREE_ANSWER = { Selector: DegreeSelector, empty: { roman: null }, isComplete: (s) => Boolean(s.roman), format: (s) => s.roman ?? '' }
 const ROLE_ANSWER = { Selector: RoleSelector, empty: { role: null }, isComplete: (s) => Boolean(s.role), format: (s) => roleLabel(s.role) }
 const sameRole = (sel, card) => sel.role === card.role
+const KEYS_ANSWER = {
+  Selector: PianoKeySelector,
+  empty: { keys: [] },
+  isComplete: (s) => s.keys.length >= 3,
+  format: (s) => s.keys.map((k) => pitchClassName(k % 12)).join(' · '),
+}
 
 const degreeLabel = (c) => `${c.key} · ${c.roman} · ${formatChordName(c)}`
 
@@ -54,6 +62,21 @@ export const EXERCISES = [
     answer: CHORD_ANSWER,
     matches: sameChordEnharmonic,
     formatCard: formatChordName,
+  },
+  {
+    id: 'piano-build',
+    label: "Construire l'accord",
+    instrument: 'Piano',
+    icon: '🎹',
+    hint: 'Le nom d’un accord : tape ses touches sur le clavier. Fondamentale → tierce → quinte → septième, dans l’ordre qu’on veut.',
+    unit: 'accord',
+    cards: PIANO_BUILD_CHORDS,
+    section: 'pianoBuildStats',
+    Prompt: PianoBuildPrompt,
+    question: 'Quelles touches ?',
+    answer: KEYS_ANSWER,
+    matches: (sel, card) => sameNotes(sel.keys, card.keys),
+    formatCard: (c) => c.name,
   },
   {
     id: 'guitar-role',

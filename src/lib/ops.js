@@ -6,7 +6,7 @@ import { applyAnswers } from './leitner.js'
 
 // Sections de data.json portant l'état Leitner d'un exercice, garanties
 // présentes à la lecture (voir github.js).
-export const STAT_SECTIONS = ['chordStats', 'pianoChordStats', 'guitarRoleStats', 'pianoRoleStats', 'degreeToChordStats', 'degreeToSeventhStats', 'chordToDegreeStats']
+export const STAT_SECTIONS = ['chordStats', 'pianoChordStats', 'pianoBuildStats', 'guitarRoleStats', 'pianoRoleStats', 'degreeToChordStats', 'degreeToSeventhStats', 'chordToDegreeStats']
 
 /**
  * Enregistre les réponses d'une partie dans la section d'un exercice :

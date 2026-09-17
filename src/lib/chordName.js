@@ -48,6 +48,10 @@ export function rootPitchClass(root, acc) {
   return (NOTE_PC[root] + ACC_PC[acc] + 12) % 12
 }
 
+// Graphie usuelle d'une classe de hauteur isolée (C# et F# en dièses, le reste en bémols).
+const PC_NAMES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B']
+export const pitchClassName = (pc) => PC_NAMES[((pc % 12) + 12) % 12]
+
 /** Même accord à la graphie près : A#m = Bbm. */
 export function sameChordEnharmonic(a, b) {
   return rootPitchClass(a.root, a.acc) === rootPitchClass(b.root, b.acc) && a.qual === b.qual
