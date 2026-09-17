@@ -55,3 +55,27 @@ export function FretboardFindPrompt({ card, label, solved }) {
     </>
   )
 }
+
+/** Un point de départ sur le manche : où est l'intervalle demandé, sur une corde plus aiguë ? */
+export function FretIntervalPrompt({ card, label, solved }) {
+  return (
+    <>
+      {solved && <FretboardDiagram marks={[...card.marks, ...card.targets]} label={label} />}
+      <p className="text-prompt">
+        Une <strong>{card.interval}</strong> au-dessus de la note marquée
+        <br />
+        <span className="muted small">sur une corde plus aiguë, n'importe laquelle</span>
+      </p>
+    </>
+  )
+}
+
+/** Une forme barrée sans son nom : quelle forme CAGED ? */
+export function CagedPrompt({ card, label }) {
+  return (
+    <>
+      <ChordDiagram card={card} label={label} />
+      <p className="text-prompt">Quelle forme ?</p>
+    </>
+  )
+}

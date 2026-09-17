@@ -626,3 +626,10 @@ details.card > summary {
   color: var(--accent-text);
   opacity: 0.8;
 }
+.chord-pos {
+  fill: var(--text-2);
+  font-size: 11px;
+}
+.fret-dot.origin {
+  fill: var(--data);
+}
