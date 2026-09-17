@@ -4,10 +4,12 @@ import { formatChordName, sameChord } from '../../lib/chordName.js'
 import { CHORD_ANSWER } from '../common/answers.js'
 import { DEGREE_CARDS, DEGREE_SEVENTH_CARDS } from './degrees.js'
 import DegreeSelector from './DegreeSelector.jsx'
+import { INTERVAL_NAME_CARDS, INTERVAL_NOTE_CARDS, intervalLabel, inversion } from './intervals.js'
+import IntervalSelector from './IntervalSelector.jsx'
 import KeySelector from './KeySelector.jsx'
 import { MODE_NAME_CARDS, MODE_PARENT_CARDS } from './modes.js'
 import ModeSelector from './ModeSelector.jsx'
-import { ChordToDegreePrompt, DegreeToChordPrompt, ModeNamePrompt, ModeParentPrompt, ScalePrompt } from './prompts.jsx'
+import { ChordToDegreePrompt, DegreeToChordPrompt, IntervalNamePrompt, IntervalNotePrompt, ModeNamePrompt, ModeParentPrompt, ScalePrompt } from './prompts.jsx'
 import { SCALE_CARDS, noteName } from './scales.js'
 import ScaleSelector from './ScaleSelector.jsx'
 
@@ -25,6 +27,19 @@ const KEY_ANSWER = {
   isComplete: (s) => Boolean(s.root) && typeof s.acc === 'string',
   format: (s) => `${s.root}${s.acc} majeur`,
 }
+const NOTE_ANSWER = { ...KEY_ANSWER, format: (s) => `${s.root}${s.acc}` }
+const INTERVAL_ANSWER = {
+  Selector: IntervalSelector,
+  empty: { number: null, quality: null },
+  isComplete: (s) => Boolean(s.number && s.quality),
+  format: (s) => intervalLabel(s.number, s.quality),
+}
+
+// Retour d'un intervalle : demi-tons, lettres comptées, renversement.
+const intervalFacts = (c) => {
+  const inv = inversion(c.number, c.quality)
+  return `${c.semitones} ½ tons${inv ? ` · renversement : ${intervalLabel(inv.n, inv.quality)}` : ''}`
+}
 const MODE_ANSWER = { Selector: ModeSelector, empty: { mode: null }, isComplete: (s) => Boolean(s.mode), format: (s) => s.mode }
 
 const degreeLabel = (c) => `${c.key} · ${c.roman} · ${formatChordName(c)}`
@@ -38,6 +53,36 @@ export const THEORY = {
   label: instrument,
   icon,
   exercises: [
+    {
+      id: 'interval-name',
+      label: 'Nommer l’intervalle',
+      instrument,
+      icon,
+      hint: 'Deux notes, en montant : quel intervalle ? Les lettres donnent le nombre (C → A : six lettres, une sixte), les demi-tons la qualité.',
+      unit: 'carte',
+      cards: INTERVAL_NAME_CARDS,
+      section: 'intervalNameStats',
+      Prompt: IntervalNamePrompt,
+      question: 'Quel intervalle ?',
+      answer: INTERVAL_ANSWER,
+      matches: (sel, card) => sel.number === card.number && sel.quality === card.quality,
+      formatCard: (c) => `${c.fromName} → ${c.toName} : ${c.label} (${intervalFacts(c)})`,
+    },
+    {
+      id: 'interval-note',
+      label: 'Note à l’intervalle',
+      instrument,
+      icon,
+      hint: 'Une note et un intervalle : quelle note au-dessus ? Graphie stricte — une sixte majeure au-dessus de E est C#, pas Db.',
+      unit: 'carte',
+      cards: INTERVAL_NOTE_CARDS,
+      section: 'intervalNoteStats',
+      Prompt: IntervalNotePrompt,
+      question: 'Quelle note ?',
+      answer: NOTE_ANSWER,
+      matches: (sel, card) => sel.root === card.to.root && sel.acc === card.to.acc,
+      formatCard: (c) => `${c.label} au-dessus de ${c.fromName} : ${c.toName} (${intervalFacts(c)})`,
+    },
     {
       id: 'scale',
       label: 'Notes de la gamme',

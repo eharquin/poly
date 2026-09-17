@@ -44,3 +44,21 @@ export function ModeNamePrompt({ card }) {
     </p>
   )
 }
+
+/** « De C à A » — la réponse est l'intervalle. */
+export function IntervalNamePrompt({ card }) {
+  return (
+    <p className="text-prompt">
+      De <strong className="mono">{card.fromName}</strong> à <strong className="mono">{card.toName}</strong>, en montant
+    </p>
+  )
+}
+
+/** « Une sixte majeure au-dessus de E » — la réponse est la note. */
+export function IntervalNotePrompt({ card }) {
+  return (
+    <p className="text-prompt">
+      Une <strong>{card.label}</strong> au-dessus de <strong className="mono">{card.fromName}</strong>
+    </p>
+  )
+}
